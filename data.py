@@ -27,7 +27,8 @@ class InfiniteIterableDataset:
         data_path: str,
         query_field: str,
         doc_field: str,
-        buffer_size: int = 100
+        seed: int = 42,
+        buffer_size: int = 10000,
     ):
         self.data_path = data_path
         self.query_field = query_field
@@ -35,21 +36,20 @@ class InfiniteIterableDataset:
         self.epoch = 0
         self.buffer_size = buffer_size
 
+        self.dataset = load_dataset(
+            'json',
+            data_files=self.data_path,
+            split='train',
+            streaming=True,
+        ).rename_column(self.query_field, QUERY_KEY).rename_column(self.doc_field, DOC_KEY)
+        self.shuffled_dataset = self.dataset.shuffle(seed=seed, buffer_size=buffer_size)
+
     def __iter__(self):
         while True:
-            logger.info(f"Current epoch for {self.data_path}: {self.epoch}")
             self.epoch += 1
-            iterable_dataset = load_dataset(
-                'json',
-                data_files=self.data_path,
-                split='train',
-                streaming=True,
-            )
-            iterable_dataset = iterable_dataset.\
-                rename_column(self.query_field, QUERY_KEY).\
-                rename_column(self.doc_field, DOC_KEY)
-            shuffled_iterable_dataset = iterable_dataset.shuffle(seed=self.epoch, buffer_size=self.buffer_size)
-            for data in shuffled_iterable_dataset:
+            logger.info(f"Current epoch for {self.data_path}: {self.epoch}")
+            self.shuffled_dataset.set_epoch(self.epoch)
+            for data in self.shuffled_dataset:
                 yield data
 
 
