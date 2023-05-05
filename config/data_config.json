@@ -1,0 +1,42 @@
+[
+  {
+    "name": "qa.en.c#.json",
+    "lines": 817970
+  },
+  {
+    "name": "qa.en.c++.json",
+    "lines": 418346
+  },
+  {
+    "name": "qa.en.c.json",
+    "lines": 204746
+  },
+  {
+    "name": "qa.en.go.json",
+    "lines": 36011
+  },
+  {
+    "name": "qa.en.java.json",
+    "lines": 831697
+  },
+  {
+    "name": "qa.en.javascript.json",
+    "lines": 1217095
+  },
+  {
+    "name": "qa.en.lisp.json",
+    "lines": 4612
+  },
+  {
+    "name": "qa.en.php.json",
+    "lines": 709196
+  },
+  {
+    "name": "qa.en.python.json",
+    "lines": 1008478
+  },
+  {
+    "name": "qa.en.ruby.json",
+    "lines": 131218
+  }
+]
