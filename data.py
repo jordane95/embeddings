@@ -2,6 +2,7 @@ import os
 import random
 import logging
 from dataclasses import dataclass
+from typing import Dict
 
 import numpy as np
 import torch
@@ -25,14 +26,11 @@ class InfiniteIterableDataset:
     def __init__(
         self,
         data_path: str,
-        query_field: str,
-        doc_field: str,
+        column_mapping: Dict[str, str] = {},
         seed: int = 42,
         buffer_size: int = 10000,
     ):
         self.data_path = data_path
-        self.query_field = query_field
-        self.doc_field = doc_field
         self.epoch = 0
         self.buffer_size = buffer_size
 
@@ -41,7 +39,7 @@ class InfiniteIterableDataset:
             data_files=self.data_path,
             split='train',
             streaming=True,
-        ).rename_column(self.query_field, QUERY_KEY).rename_column(self.doc_field, DOC_KEY)
+        ).rename_columns(column_mapping)
         self.shuffled_dataset = self.dataset.shuffle(seed=seed, buffer_size=buffer_size)
 
     def __iter__(self):
@@ -67,11 +65,17 @@ class InfiniteMultipleIterableDataset(torch.utils.data.IterableDataset):
         self.all_data_streams = []
         self.data_sizes = []
 
+        self.column_mapping = {}
+        if query_field != QUERY_KEY:
+            self.column_mapping[query_field] = QUERY_KEY
+        if doc_field != DOC_KEY:
+            self.column_mapping[doc_field] = DOC_KEY
+
         for i, data_info in enumerate(data_config):
             data_path = os.path.join(train_dir, data_info["name"])
             data_size = int(data_info["lines"])
 
-            iterable_dataset = InfiniteIterableDataset(data_path=data_path, query_field=query_field, doc_field=doc_field)
+            iterable_dataset = InfiniteIterableDataset(data_path=data_path, column_mapping=self.column_mapping)
             self.all_data_streams.append(iter(iterable_dataset))
             self.data_sizes.append(data_size)
         
