@@ -40,12 +40,6 @@ class DataArguments:
     train_dir: str = field(
         default=None, metadata={"help": "Path to train directory"}
     )
-    dataset_name: str = field(
-        default=None, metadata={"help": "huggingface dataset name"}
-    )
-    dataset_proc_num: int = field(
-        default=12, metadata={"help": "number of proc used in dataset preprocess"}
-    )
 
     data_config: str = field(default="config/data_config.json")
 
@@ -59,7 +53,7 @@ class DataArguments:
     )
 
     q_max_len: int = field(
-        default=32,
+        default=128,
         metadata={
             "help": "The maximum total input sequence length after tokenization for query. Sequences longer "
                     "than this will be truncated, sequences shorter will be padded."

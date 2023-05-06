@@ -67,6 +67,7 @@ class AutoModelForSentenceEmbedding(nn.Module):
         doc: Dict[str, Tensor] = None,
         temperature: float = 1.0,
         negatives_x_device: bool = False,
+        loss_scale: float = 1.0,
     ):
         q_embeddings = self.encode(query) # (batch_size, embedding_dim)
         d_embeddings = self.encode(doc)
@@ -77,14 +78,15 @@ class AutoModelForSentenceEmbedding(nn.Module):
                 d_reps=d_embeddings
             )
 
-        if dist.is_initialized():
+        if negatives_x_device and dist.is_initialized():
             q_embeddings = dist_gather_tensor(q_embeddings)
             d_embeddings = dist_gather_tensor(d_embeddings)
+
 
         scores, labels = full_contrastive_scores_and_labels(q_embeddings, d_embeddings, use_all_pairs=True)
         scores /= temperature
 
-        loss = self.cross_entropy(scores, labels)
+        loss = self.cross_entropy(scores, labels) * loss_scale
         # import pdb; pdb.set_trace();
         return EncoderOutput(
             q_reps=q_embeddings,

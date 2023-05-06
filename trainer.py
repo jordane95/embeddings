@@ -42,7 +42,12 @@ class EmbeddingTrainer(Trainer):
         torch.save(self.args, os.path.join(output_dir, TRAINING_ARGS_NAME))
 
     def compute_loss(self, model, inputs):
-        return model(**inputs, temperature=self.args.temperature).loss
+        return model(
+            **inputs,
+            temperature=self.args.temperature,
+            negatives_x_device=self.args.negatives_x_device,
+            loss_scale=self._dist_loss_scale_factor,
+        ).loss
 
     def training_step(self, *args):
         return super(EmbeddingTrainer, self).training_step(*args) / self._dist_loss_scale_factor
