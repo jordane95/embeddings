@@ -116,6 +116,7 @@ def main():
         batch_size=global_batch_size,
         query_field=data_args.query_column,
         doc_field=data_args.doc_column,
+        coeff=data_args.mix_coefficient,
     )
 
     data_collator = QDCollator(

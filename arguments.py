@@ -43,6 +43,8 @@ class DataArguments:
 
     data_config: str = field(default="config/data_config.json")
 
+    mix_coefficient: float = field(default=0.0) 
+
     query_column: Optional[str] = field(
         default="question",
         metadata={"help": "The name of the column in the datasets containing the questions."},
