@@ -32,10 +32,11 @@ class AutoModelForSentenceEmbedding(nn.Module):
         normalize: bool = True,
         add_pooler: bool = False,
         embedding_dim: Optional[int] = None,
+        **kwargs,
     ):
         super(AutoModelForSentenceEmbedding, self).__init__()
 
-        self.lm = AutoModel.from_pretrained(model_name_or_path)
+        self.lm = AutoModel.from_pretrained(model_name_or_path, **kwargs)
         self.pooling = pooling
         self.normalize = normalize
         self.add_pooler = add_pooler
@@ -46,9 +47,10 @@ class AutoModelForSentenceEmbedding(nn.Module):
     def encode(self, texts):
         if texts is None:
             return None
+        pooling_mask = texts.pop('pooling_mask') if "pooling_mask" in texts else texts['attention_mask']
         outputs = self.lm(**texts)
         last_hidden_state = outputs.last_hidden_state
-        embeddings = self.pool_sentence_embedding(last_hidden_state, texts['attention_mask'])
+        embeddings = self.pool_sentence_embedding(last_hidden_state, pooling_mask)
         embeddings = self.pooler(embeddings)
         if self.normalize:
             embeddings = F.normalize(embeddings, p=2, dim=1)
@@ -57,7 +59,7 @@ class AutoModelForSentenceEmbedding(nn.Module):
     def pool_sentence_embedding(self, last_hidden_state: Tensor, attention_mask: Tensor) -> Tensor:
         if self.pooling == 'mean':
             last_hidden = last_hidden_state.masked_fill(~attention_mask[..., None].bool(), 0.0)
-            return last_hidden.sum(dim=1) / attention_mask.sum(dim=1)[..., None]
+            return last_hidden.sum(dim=1) / torch.clamp(attention_mask.sum(dim=1), min=1e-9)[..., None]
         elif self.pooling == 'cls':
             return last_hidden_state[:, 0]
 

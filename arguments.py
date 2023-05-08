@@ -43,7 +43,7 @@ class DataArguments:
 
     data_config: str = field(default="config/data_config.json")
 
-    mix_coefficient: float = field(default=0.0) 
+    mix_coefficient: float = field(default=0.0)
 
     query_column: Optional[str] = field(
         default="question",
@@ -72,6 +72,12 @@ class DataArguments:
         default=None, metadata={"help": "Where do you want to store the data downloaded from huggingface"}
     )
 
+    add_prompt: bool = field(
+        default=False, metadata={"help": "Prepend simple prompt to the text. e.g, 'query: this is a query', 'doc: this is a docc'."}
+    )
+    
+    add_instruction: bool = field(
+        default=False, metadata={"help": "Prepend detailed instructions for the data."})
 
 
 @dataclass

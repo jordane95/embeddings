@@ -97,6 +97,7 @@ def main():
         model_args.model_name_or_path,
         pooling=model_args.pooling,
         normalize=model_args.normalize,
+        cache_dir=model_args.cache_dir,
     )
 
     if training_args.local_rank > 0:
@@ -122,7 +123,9 @@ def main():
     data_collator = QDCollator(
         tokenizer,
         max_q_len=data_args.q_max_len,
-        max_d_len=data_args.d_max_len
+        max_d_len=data_args.d_max_len,
+        with_prompt=data_args.add_prompt,
+        with_instruction=data_args.add_instruction,
     )
 
     # torch.autograd.set_detect_anomaly(True)

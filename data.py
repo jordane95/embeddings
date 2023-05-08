@@ -2,7 +2,7 @@ import os
 import random
 import logging
 from dataclasses import dataclass
-from typing import Dict
+from typing import Dict, Optional, List, Union
 
 import numpy as np
 import torch
@@ -14,6 +14,8 @@ from transformers import PreTrainedTokenizer, BatchEncoding, DataCollatorWithPad
 from transformers.trainer_pt_utils import IterableDatasetShard
 from transformers.utils import is_datasets_available
 import torch.distributed as dist
+
+from utils import normalize_instruction
 
 logger = logging.getLogger(__name__)
 
@@ -100,23 +102,52 @@ class InfiniteMultipleIterableDataset(torch.utils.data.IterableDataset):
 class QDCollator(DataCollatorWithPadding):
     max_q_len: int = 32
     max_d_len: int = 128
+    with_prompt: bool = False
+    with_instruction: bool = False
 
     input_keys = [QUERY_KEY, DOC_KEY]
+
+    def __post_init__(self):
+        assert not (self.with_prompt and self.with_instruction), "Cannot add prompt and instruction in the same time."
 
     def __call__(self, features):
         collated_batch = {}
 
         for key in self.input_keys:
-            text = [f[key] for f in features]
+            texts: Union[List[str], List[List[str]]] = [f[key] for f in features]
             # print(text)
+            if self.with_instruction: # add instruction
+                assert isinstance(texts[0], list), "No instruction in input text."
+                instructions = [normalize_instruction(text[0]) for text in texts]
+                texts = ['{}: {}'.format(instruction, text[1]) for instruction, text in zip(instructions, texts)]
+                instruction_mask = self.tokenizer(
+                    instructions,
+                    padding='max_length',
+                    truncation=True,
+                    max_length=self.max_d_len if key == DOC_KEY else self.max_q_len,
+                    return_tensors='pt',
+                    add_special_tokens=True,
+                    return_token_type_ids=False,
+                    return_attention_mask=True,
+                )['attention_mask'] # Tensor shape (batch_size, max_seq_len)
+                # instruction_mask[:, 0] = 0 # unmask cls tokens # commented out since this only works for bert-family models
+            else: # do not add instruction
+                if isinstance(texts[0], list): # if input format is [instruction, text] with instruction
+                    texts = [text[1] for text in texts] # List[str]
+                if self.with_prompt: # if add simple prompt
+                    texts = ['{}: {}'.format(key, text) for text in texts]
+
             text_batch = self.tokenizer(
-                text,
+                texts,
                 padding='max_length',
                 truncation=True,
                 max_length=self.max_d_len if key == DOC_KEY else self.max_q_len,
                 return_tensors="pt",
             )
+            if self.with_instruction:
+                text_batch["pooling_mask"] = (~(instruction_mask.bool()) & text_batch["attention_mask"].bool())
+            else:
+                text_batch["pooling_mask"] = text_batch["attention_mask"]
             collated_batch[key] = text_batch
 
         return collated_batch
-

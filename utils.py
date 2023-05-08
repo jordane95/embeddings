@@ -5,6 +5,13 @@ import torch.distributed as dist
 from typing import List, Union, Optional, Tuple, Mapping, Dict
 
 
+def normalize_instruction(instruction: str):
+    instruction = instruction.strip()
+    if instruction[-1] in [';', ':', ',', '.']:
+        return instruction[:-1]
+    else:
+        return instruction
+
 def dist_gather_tensor(t: Optional[torch.Tensor]) -> Optional[torch.Tensor]:
     if t is None:
         return None

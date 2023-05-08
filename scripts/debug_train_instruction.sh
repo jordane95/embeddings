@@ -8,11 +8,12 @@ export CUDA_VISIBLE_DEVICES=2
 deepspeed train.py --deepspeed config/ds_config.json \
     --model_name_or_path bert-base-uncased \
     --output_dir debug \
-    --train_dir /data01/lizehan/proqa/pls \
-    --data_config config/data_config.json \
-    --query_column question \
-    --doc_column answer \
+    --train_dir /data01/lizehan/embeddings/data \
+    --data_config config/data_instruction_config.json \
+    --add_instruction False \
     --add_prompt \
+    --query_column query \
+    --doc_column pos \
     --max_steps 20000 \
     --learning_rate 2e-4 \
     --logging_steps 10 \
