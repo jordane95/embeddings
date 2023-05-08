@@ -104,6 +104,7 @@ class QDCollator(DataCollatorWithPadding):
     max_d_len: int = 128
     with_prompt: bool = False
     with_instruction: bool = False
+    mask_instruction_pooling: bool = True
 
     input_keys = [QUERY_KEY, DOC_KEY]
 
@@ -144,10 +145,8 @@ class QDCollator(DataCollatorWithPadding):
                 max_length=self.max_d_len if key == DOC_KEY else self.max_q_len,
                 return_tensors="pt",
             )
-            if self.with_instruction:
+            if self.with_instruction and self.mask_instruction_pooling:
                 text_batch["pooling_mask"] = (~(instruction_mask.bool()) & text_batch["attention_mask"].bool())
-            else:
-                text_batch["pooling_mask"] = text_batch["attention_mask"]
             collated_batch[key] = text_batch
 
         return collated_batch

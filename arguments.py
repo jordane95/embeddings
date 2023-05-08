@@ -77,7 +77,12 @@ class DataArguments:
     )
     
     add_instruction: bool = field(
-        default=False, metadata={"help": "Prepend detailed instructions for the data."})
+        default=False, metadata={"help": "Prepend detailed instructions for the data."}
+    )
+
+    mask_instruction_pooling: bool = field(
+        default=True, metadata={"help": "Whether or not mask instruction tokens during pooling."}
+    )
 
 
 @dataclass

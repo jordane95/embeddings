@@ -10,8 +10,8 @@ deepspeed train.py --deepspeed config/ds_config.json \
     --output_dir debug \
     --train_dir /data01/lizehan/embeddings/data \
     --data_config config/data_instruction_config.json \
-    --add_instruction False \
-    --add_prompt \
+    --add_instruction \
+    --mask_instruction_pooling False \
     --query_column query \
     --doc_column pos \
     --max_steps 20000 \

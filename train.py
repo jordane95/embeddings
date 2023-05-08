@@ -126,6 +126,7 @@ def main():
         max_d_len=data_args.d_max_len,
         with_prompt=data_args.add_prompt,
         with_instruction=data_args.add_instruction,
+        mask_instruction_pooling=data_args.mask_instruction_pooling,
     )
 
     # torch.autograd.set_detect_anomaly(True)
