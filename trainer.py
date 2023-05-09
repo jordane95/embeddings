@@ -3,9 +3,11 @@ from itertools import repeat
 from typing import Dict, List, Tuple, Optional, Any, Union
 
 from transformers.trainer import Trainer
+from transformers.trainer_utils import has_length
+from transformers.trainer_pt_utils import ShardSampler
 
 import torch
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, SequentialSampler
 import torch.distributed as dist
 
 from loss import SimpleContrastiveLoss, DistributedContrastiveLoss
@@ -27,6 +29,34 @@ class EmbeddingTrainer(Trainer):
     def __init__(self, *args, **kwargs):
         super(EmbeddingTrainer, self).__init__(*args, **kwargs)
         self._dist_loss_scale_factor = dist.get_world_size() if self.args.negatives_x_device and dist.is_initialized() else 1
+
+    def _get_train_sampler(self) -> Optional[torch.utils.data.Sampler]:
+        if self.train_dataset is None or not has_length(self.train_dataset):
+            return None
+
+        generator = None
+        if self.args.world_size <= 1:
+            generator = torch.Generator()
+            # for backwards compatibility, we generate a seed here (which is sampled from a generator seeded with
+            # `args.seed`) if data_seed isn't provided.
+            # Further on in this method, we default to `args.seed` instead.
+            if self.args.data_seed is None:
+                seed = int(torch.empty((), dtype=torch.int64).random_().item())
+            else:
+                seed = self.args.data_seed
+            generator.manual_seed(seed)
+
+        seed = self.args.data_seed if self.args.data_seed is not None else self.args.seed
+
+        if self.args.world_size <= 1:
+            return SequentialSampler(self.train_dataset)
+        else:
+            return ShardSampler(
+                self.train_dataset,
+                batch_size=self.args.per_device_train_batch_size,
+                num_processes=self.args.world_size,
+                process_index=self.args.process_index,
+            )
 
     def _save(self, output_dir: Optional[str] = None, state_dict=None):
         # If we are executing this function, we are the process zero, so we don't check for that.

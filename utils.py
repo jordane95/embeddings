@@ -7,7 +7,7 @@ from typing import List, Union, Optional, Tuple, Mapping, Dict
 
 def normalize_instruction(instruction: str):
     instruction = instruction.strip()
-    if instruction[-1] in [';', ':', ',', '.']:
+    if len(instruction) > 0 and instruction[-1] in [';', ':', ',', '.']:
         return instruction[:-1]
     else:
         return instruction

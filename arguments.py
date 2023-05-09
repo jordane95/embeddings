@@ -84,6 +84,8 @@ class DataArguments:
         default=True, metadata={"help": "Whether or not mask instruction tokens during pooling."}
     )
 
+    finetune_data_path: str = field(default=None, metadata={"help": "Path to the json file for finetuning."})
+
 
 @dataclass
 class EmbeddingTrainingArguments(TrainingArguments):

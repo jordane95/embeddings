@@ -47,7 +47,7 @@ class AutoModelForSentenceEmbedding(nn.Module):
     def encode(self, texts):
         if texts is None:
             return None
-        import pdb; pdb.set_trace()
+        # import pdb; pdb.set_trace()
         pooling_mask = texts.pop('pooling_mask') if "pooling_mask" in texts else texts['attention_mask']
         outputs = self.lm(**texts)
         last_hidden_state = outputs.last_hidden_state
@@ -114,3 +114,37 @@ class AutoModelForSentenceEmbedding(nn.Module):
                 self.pooer.load_state_dict(pooler_states)
             except FileNotFoundError:
                 logger.info(f"Cannot find pooler.pt at {output_path}")
+
+
+
+class AutoModelForEmbeddingTriple(AutoModelForSentenceEmbedding):
+    def forward(
+        self,
+        query: Dict[str, Tensor] = None,
+        pos: Dict[str, Tensor] = None,
+        neg: Dict[str, Tensor] = None,
+        temperature: float = 1.0,
+        negatives_x_device: bool = False,
+        loss_scale: float = 1.0,
+    ):
+        q_embeddings = self.encode(query) # (batch_size, embedding_dim)
+        p_embeddings = self.encode(pos)
+        n_embeddings = self.encode(neg)
+
+        if negatives_x_device and dist.is_initialized():
+            q_embeddings = dist_gather_tensor(q_embeddings)
+            p_embeddings = dist_gather_tensor(p_embeddings)
+            n_embeddings = dist_gather_tensor(n_embeddings)
+        
+        d_embeddings = torch.cat([p_embeddings, n_embeddings])
+        scores, labels = full_contrastive_scores_and_labels(q_embeddings, d_embeddings, use_all_pairs=True)
+        scores /= temperature
+
+        loss = self.cross_entropy(scores, labels) * loss_scale
+        # import pdb; pdb.set_trace()
+        return EncoderOutput(
+            q_reps=q_embeddings,
+            d_reps=d_embeddings,
+            scores=scores,
+            loss=loss,
+        )
