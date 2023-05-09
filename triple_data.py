@@ -44,6 +44,10 @@ class MultiDataset:
     def __len__(self):
         return len(self.task_data_idxs)
     
+    def shuffle_batch(self):
+        """Shuld be called at the begin of each epoch"""
+        self.task_data_idxs = self.batched_shuffle(self.task_to_datasize, self.batch_size)
+    
     @staticmethod
     def batched_shuffle(task_to_datasize: Dict[str, int], batch_size: int) -> List[Dict[str, Any]]:
         task_idxs_batches = [] # List[Dict[str, Any]], list of batches, each batch is a dict with task name and in task batched idxs

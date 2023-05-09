@@ -13,6 +13,11 @@ from transformers import (
     set_seed,
 )
 from transformers.trainer_utils import is_main_process
+from transformers import (
+    TrainerCallback,
+    TrainerState,
+    TrainerControl
+)
 
 from arguments import (
     ModelArguments,
@@ -32,6 +37,15 @@ from trainer import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+class ShuffleCallback(TrainerCallback):
+    def on_epoch_begin(self, args: TrainingArguments, state: TrainerState, control: TrainerControl, **kwargs):
+        """
+        Event called at the beginning of an epoch.
+        """
+        train_dataloader = kwargs['train_dataloader']
+        train_dataloader.dataset.shuffle_batch()
 
 
 def main():
@@ -135,6 +149,7 @@ def main():
         data_collator=data_collator,
         tokenizer=tokenizer,
     )
+    trainer.add_callback(ShuffleCallback())
 
     trainer.train()  # TODO: resume training
     trainer.save_model()

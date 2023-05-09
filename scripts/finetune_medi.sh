@@ -12,7 +12,7 @@ export CUDA_VISIBLE_DEVICES=2
 pretrained_model_or_path=bert-base-uncased
 output_dir=ckpt/ft_medi
 
-data_path=/data01/lizehan/embeddings/instructor-embedding/cache/medi-data.json
+data_path=/data01/lizehan/embeddings/instructor-embedding/cache/samples.100.json
 add_instruction=False
 
 deepspeed finetune.py --deepspeed config/ds_config.json \
@@ -20,7 +20,7 @@ deepspeed finetune.py --deepspeed config/ds_config.json \
     --output_dir $output_dir \
     --finetune_data_path $data_path \
     --add_instruction $add_instruction \
-    --num_train_epochs 3 \
+    --num_train_epochs 2 \
     --learning_rate 2e-5 \
     --logging_steps 500 \
     --save_steps 1000 \
