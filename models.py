@@ -63,6 +63,28 @@ class AutoModelForSentenceEmbedding(nn.Module):
             return last_hidden.sum(dim=1) / torch.clamp(attention_mask.sum(dim=1), min=1e-9)[..., None]
         elif self.pooling == 'cls':
             return last_hidden_state[:, 0]
+        elif self.pooling == 'weightedmean':
+            token_embeddings = last_hidden_state
+            input_mask_expanded = attention_mask.unsqueeze(-1).expand(token_embeddings.size()).float()
+            # token_embeddings shape: bs, seq, hidden_dim
+            weights = (
+                    torch.arange(start=1, end=token_embeddings.shape[1] + 1)
+                    .unsqueeze(0)
+                    .unsqueeze(-1)
+                    .expand(token_embeddings.size())
+                    .float().to(token_embeddings.device)
+                )
+            assert weights.shape == token_embeddings.shape == input_mask_expanded.shape
+            input_mask_expanded = input_mask_expanded * weights
+            
+            sum_embeddings = torch.sum(token_embeddings * input_mask_expanded, 1)
+
+            sum_mask = input_mask_expanded.sum(1)
+
+            sum_mask = torch.clamp(sum_mask, min=1e-9)
+            return sum_embeddings / sum_mask
+        else:
+            raise NotImplementedError(f"Currently do not support pooling method: {self.pooling}")
 
     def forward(
         self,
