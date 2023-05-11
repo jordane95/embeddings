@@ -5,9 +5,15 @@ export CUDA_VISIBLE_DEVICES=0,1
 # python train.py \
 # deepspeed train.py --deepspeed config/ds_config.json \
 
+# bloom-560m
 # fp16 crushed..., 512bs + deepspeed + gradckpt => 37G
 # with weighted mean pooling, fp16 sucess!??, now => 22G
-# 1024bs => 35G
+# 1024bs => 35G. 66h
+
+
+# bloom-1b1
+# 512bs => 34G, 53h
+
 
 deepspeed train.py --deepspeed config/ds_config.json \
     --model_name_or_path bigscience/bloom-560m \
