@@ -1,5 +1,5 @@
 
-export CUDA_VISIBLE_DEVICES=0,1
+export CUDA_VISIBLE_DEVICES=2,3
 
 # torchrun --nproc_per_node 2 train.py \
 # python train.py \
@@ -14,9 +14,11 @@ export CUDA_VISIBLE_DEVICES=0,1
 # bloom-1b1
 # 512bs => 34G, 53h
 
+# gpt-neo-125m
+# 2048bs => 35G, 43h
 
 deepspeed train.py --deepspeed config/ds_config.json \
-    --model_name_or_path bigscience/bloom-560m \
+    --model_name_or_path EleutherAI/gpt-neo-125m \
     --output_dir debug \
     --train_dir /data01/lizehan/proqa/pls \
     --data_config config/data_config.json \
@@ -27,7 +29,7 @@ deepspeed train.py --deepspeed config/ds_config.json \
     --logging_steps 2 \
     --save_steps 500 \
     --warmup_ratio 0.05 \
-    --per_device_train_batch_size 128 \
+    --per_device_train_batch_size 2048 \
     --normalize True \
     --pooling weightedmean \
     --temperature 0.01 \

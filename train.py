@@ -93,7 +93,9 @@ def main():
         model_args.tokenizer_name if model_args.tokenizer_name else model_args.model_name_or_path,
         cache_dir=model_args.cache_dir
     )
-    tokenizer.padding_side = 'right'
+    tokenizer.padding_side = 'right' # bloom
+    if "gpt" in model_args.model_name_or_path: # gpt-neo
+        tokenizer.pad_token = tokenizer.eos_token
     model = AutoModelForSentenceEmbedding(
         model_args.model_name_or_path,
         pooling=model_args.pooling,
