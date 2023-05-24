@@ -1,12 +1,15 @@
 
-export CUDA_VISIBLE_DEVICES=2
+export CUDA_VISIBLE_DEVICES=2,3
 
 # torchrun --nproc_per_node 2 train.py \
 # python train.py \
 # deepspeed train.py --deepspeed config/ds_config.json \
 
+# bert-large
+# 1024bs => 26G 42h
+
 deepspeed train.py --deepspeed config/ds_config.json \
-    --model_name_or_path bert-base-uncased \
+    --model_name_or_path bert-large-uncased \
     --output_dir debug \
     --train_dir /data01/lizehan/proqa/pls \
     --data_config config/data_config.json \
@@ -18,10 +21,10 @@ deepspeed train.py --deepspeed config/ds_config.json \
     --logging_steps 10 \
     --save_steps 500 \
     --warmup_ratio 0.05 \
-    --per_device_train_batch_size 1024 \
+    --per_device_train_batch_size 2048 \
     --normalize True \
     --temperature 0.01 \
-    --negatives_x_device False \
+    --negatives_x_device True \
     --fp16 \
     --gradient_checkpointing True \
     --grad_cache False \

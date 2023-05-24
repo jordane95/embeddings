@@ -31,7 +31,7 @@ deepspeed train.py --deepspeed config/ds_config.json \
     --warmup_ratio 0.05 \
     --per_device_train_batch_size 2048 \
     --normalize True \
-    --pooling weightedmean \
+    --pooling last \
     --temperature 0.01 \
     --negatives_x_device True \
     --fp16 True \
