@@ -1,6 +1,5 @@
 
 export CUDA_VISIBLE_DEVICES=2,3
-
 # torchrun --nproc_per_node 2 train.py \
 # python train.py \
 # deepspeed train.py --deepspeed config/ds_config.json \
@@ -9,15 +8,15 @@ export CUDA_VISIBLE_DEVICES=2,3
 # fp16 crushed..., 512bs + deepspeed + gradckpt => 37G
 # with weighted mean pooling, fp16 sucess!??, now => 22G
 # 1024bs => 35G. 66h
-# 128bs + bitfit => 7G
-# 128bs => 13G
+
 
 # bloom-1b1
 # 512bs => 34G, 53h
 
+model_path="/data01/lizehan/llm/llama_hf/7B"
 
 deepspeed train.py --deepspeed config/ds_config.json \
-    --model_name_or_path bigscience/bloom-560m \
+    --model_name_or_path ${model_path} \
     --output_dir debug \
     --train_dir /data01/lizehan/proqa/pls \
     --data_config config/data_config.json \
@@ -28,14 +27,16 @@ deepspeed train.py --deepspeed config/ds_config.json \
     --logging_steps 2 \
     --save_steps 500 \
     --warmup_ratio 0.05 \
-    --per_device_train_batch_size 128 \
+    --per_device_train_batch_size 1 \
     --normalize True \
     --pooling last \
     --temperature 0.01 \
     --negatives_x_device True \
-    --fp16 True \
+    --fp16 False \
     --gradient_checkpointing True \
     --grad_cache False \
     --seed 42 \
     --dataloader_num_workers 1 \
-    --bitfit False
+    --add_pooler \
+    --embedding_dim 768 \
+    --bf16 True 

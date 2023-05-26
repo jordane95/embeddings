@@ -25,6 +25,9 @@ class ModelArguments:
     normalize: bool = field(default=False)
     pooling: str = field(default='mean')
 
+    # peft
+    bitfit: bool = field(default=False)
+
     # for Jax training
     dtype: Optional[str] = field(
         default="float32",

@@ -32,6 +32,7 @@ class AutoModelForSentenceEmbedding(nn.Module):
         normalize: bool = True,
         add_pooler: bool = False,
         embedding_dim: Optional[int] = None,
+        bitfit: bool = False,
         **kwargs,
     ):
         super(AutoModelForSentenceEmbedding, self).__init__()
@@ -41,6 +42,11 @@ class AutoModelForSentenceEmbedding(nn.Module):
         self.normalize = normalize
         self.add_pooler = add_pooler
         self.pooler = nn.Linear(self.lm.config.hidden_size, embedding_dim or self.lm.config.hidden_size) if add_pooler else nn.Identity()
+
+        if bitfit:
+            for name, param in self.lm.named_parameters():
+                if 'bias' not in name:
+                    param.requires_grad = False
 
         self.cross_entropy = nn.CrossEntropyLoss(reduction='mean')
 

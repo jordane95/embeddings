@@ -100,6 +100,9 @@ def main():
         model_args.model_name_or_path,
         pooling=model_args.pooling,
         normalize=model_args.normalize,
+        add_pooler=model_args.add_pooler,
+        embedding_dim=model_args.embedding_dim,
+        bitfit=model_args.bitfit,
         cache_dir=model_args.cache_dir,
     )
 
