@@ -68,7 +68,7 @@ class RetrievalDataset(torch.utils.data.Dataset):
         self.query_id = read_mapping_id(data_config['train_query_id_file'])
 
         if data_config['neg_file']:
-            self.train_negative = read_neg_file(data_config.neg_file)
+            self.train_negative = read_neg_file(data_config['neg_file'])
         else:
             self.train_negative = generate_random_neg(list(self.query_id.keys()), list(self.corpus_id.keys()))
 
