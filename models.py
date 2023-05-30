@@ -199,3 +199,61 @@ class AutoModelForEmbeddingTriple(AutoModelForSentenceEmbedding):
             scores=scores,
             loss=loss,
         )
+
+
+class AutoModelForEmbeddingMNKD(AutoModelForSentenceEmbedding):
+    # mutiple negatives and knowledge distillation
+    def __init__(self, *args, **kwargs):
+        super(AutoModelForEmbeddingMNKD, self).__init__(*args, **kwargs)
+        self.kl = nn.KLDivLoss(reduction="batchmean")
+
+    def forward(
+        self,
+        query: Dict[str, Tensor] = None,
+        pos: Dict[str, Tensor] = None,
+        negs: Dict[str, Tensor] = None,
+        teacher_score: Tensor = None,
+        temperature: float = 1.0,
+        negatives_x_device: bool = False,
+        loss_scale: float = 1.0,
+    ):
+        q_embeddings = self.encode(query) # (batch_size, embedding_dim)
+        p_embeddings = self.encode(pos) # (batch_size, embedding_dim)
+        n_embeddings = self.encode(negs) # (batch_size * num_neg, embedding_dim)
+
+        kl_loss = 0.0
+        self.contrastive_loss_weight = 0.2
+        if teacher_score is not None:
+            batch_size, embedding_dim = q_embeddings.shape
+            student_q = q_embeddings.view(batch_size, 1, embedding_dim)  # B 1 D
+            student_p = p_embeddings.view(batch_size, 1, embedding_dim)  # B 1 D
+            student_n = n_embeddings.view(batch_size, -1, embedding_dim) # B N D
+            student_d = torch.cat([student_p, student_n], dim=1) # B 1+N D
+            student_score = student_q @ student_d.transpose(-2, -1) # B 1 1+N
+            student_score = student_score.squeeze(1)  # B 1+N
+
+            inputs = F.log_softmax(student_score / temperature, dim=-1)
+            target = F.softmax(teacher_score, dim=-1)
+            kl_loss = self.kl(inputs, target)
+
+        if negatives_x_device and dist.is_initialized():
+            q_embeddings = dist_gather_tensor(q_embeddings)
+            p_embeddings = dist_gather_tensor(p_embeddings)
+            n_embeddings = dist_gather_tensor(n_embeddings)
+        
+        d_embeddings = torch.cat([p_embeddings, n_embeddings])
+        scores, labels = full_contrastive_scores_and_labels(q_embeddings, d_embeddings, use_all_pairs=True)
+        scores /= temperature
+
+        loss = self.cross_entropy(scores, labels) * loss_scale
+
+        if teacher_score is not None:
+            loss = kl_loss + self.contrastive_loss_weight * loss
+
+        # import pdb; pdb.set_trace()
+        return EncoderOutput(
+            q_reps=q_embeddings,
+            d_reps=d_embeddings,
+            scores=scores,
+            loss=loss,
+        )

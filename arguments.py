@@ -89,6 +89,8 @@ class DataArguments:
 
     finetune_data_path: str = field(default=None, metadata={"help": "Path to the json file for finetuning."})
 
+    finetune_data_config: str = field(default='config/ft_data_config.yaml', metadata={"help": "Finetuning data config file."})
+
 
 @dataclass
 class EmbeddingTrainingArguments(TrainingArguments):
