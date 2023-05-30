@@ -96,6 +96,8 @@ class TripleCollatorMNKD(DataCollatorWithPadding):
 
         for key in self.input_keys:
             texts: Union[List[str], List[List[str]]] = [f[key] for f in features]
+            if key == 'negs': # for negs
+                texts = sum(texts, [])
             # print(text)
             if self.with_instruction: # add instruction
                 assert isinstance(texts[0], list), "No instruction in input text."

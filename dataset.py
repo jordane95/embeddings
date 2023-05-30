@@ -74,7 +74,7 @@ class RetrievalDataset(torch.utils.data.Dataset):
 
         self.teacher_score = None
         if data_config['teacher_score_files'] is not None:
-            self.teacher_score = read_teacher_score(data_config.teacher_score_files)
+            self.teacher_score = read_teacher_score(data_config['teacher_score_files'])
 
         self.sample_neg_from_topk = data_config['sample_neg_from_topk'] # int
         self.train_group_size = data_config['train_group_size']
