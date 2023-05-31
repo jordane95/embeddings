@@ -124,7 +124,7 @@ class RetrievalDataset(torch.utils.data.Dataset):
 
 class NQDataset(torch.utils.data.Dataset):
     def __init__(self, data_config: Dict[str, Any]):
-        self.dataset = load_dataset('json', data_files=data_config["train_files"], split='train', cache_dir='cache')
+        self.dataset = sum([json.load(open(train_file)) for train_file in data_config["train_files"]], []) # List[Dict]
         self.train_group_size = data_config['train_group_size']
     
     def __len__(self):
