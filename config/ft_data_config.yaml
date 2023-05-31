@@ -1,13 +1,21 @@
-# - name: MSMARCO
-#   corpus_file: # must
-#   corpus_id_file: # must
-#   train_query_file: # must
-#   train_query_id_file: # must
-#   train_qrels: # must
-#   neg_file: # Optinal
-#   teacher_score_files: # Optinal
-#   sample_neg_from_topk: 200
-#   train_group_size: 8
+- name: MSMARCO
+  corpus_file: # must
+  corpus_id_file: # must
+  train_query_file: # must
+  train_query_id_file: # must
+  train_qrels: # must
+  neg_file: # Optinal
+  teacher_score_files: # Optinal
+  sample_neg_from_topk: 200
+  train_group_size: 8
+
+
+- name: NQ
+  train_files:
+    - biencoder-nq-train.json
+    - hn.json
+  train_group_size: 8
+
 
 - name: NLI
   data_file: data/nli_for_simcse.csv

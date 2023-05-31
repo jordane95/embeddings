@@ -9,7 +9,7 @@ import numpy as np
 import torch
 from transformers import PreTrainedTokenizer, BatchEncoding, DataCollatorWithPadding
 
-from dataset import RetrievalDataset, NLIDataset 
+from dataset import RetrievalDataset, NLIDataset, NQDataset
 
 from utils import normalize_instruction
 
@@ -21,6 +21,7 @@ DOC_KEY = "doc"
 
 DATASET_CLS = {
     "MSMARCO": RetrievalDataset,
+    "NQ": NQDataset,
     "NLI": NLIDataset,
 }
 

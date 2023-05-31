@@ -122,6 +122,32 @@ class RetrievalDataset(torch.utils.data.Dataset):
         return {"query": query, "pos": pos_doc, "negs": neg_docs, "teacher_score": teacher_scores}
 
 
+class NQDataset(torch.utils.data.Dataset):
+    def __init__(self, data_config: Dict[str, Any]):
+        self.dataset = load_dataset('json', data_files=data_config["train_files"], split='train', cache_dir='cache')
+        self.train_group_size = data_config['train_group_size']
+    
+    def __len__(self):
+        return len(self.dataset)
+    
+    def get_doc_text(self, doc: Dict[str, Any]):
+        return "{} {}".format(doc.get('title', ''), doc['text']).strip()
+    
+    def __getitem__(self, idx):
+        item = self.dataset[idx]
+        query = item['question'] # str
+        positives = item['positive_ctxs']
+        pos = random.choice(positives)
+        pos = self.get_doc_text(pos)
+        negatives = item['hard_negative_ctxs']
+        negative_size = self.train_group_size - 1
+        if len(negatives) < negative_size:
+            negs = random.choices(negatives, k=negative_size)
+        else:
+            negs = random.sample(negatives, k=negative_size)
+        negs = [self.get_doc_text(neg) for neg in negs] # List[str]
+        return {"query": query, "pos": pos, "negs": negs}
+
 
 class NLIDataset(torch.utils.data.Dataset):
     def __init__(self, data_config: Dict[str, Any]):
