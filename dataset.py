@@ -172,9 +172,8 @@ class NLIDataset(torch.utils.data.Dataset):
 class MEDIDataset(torch.utils.data.Dataset):
     def __init__(self, data: List[Any], train_group_size: int = 16):
         self.data: List[Dict[str, Any]] = data
-        self.corpus = [] # List[str]
-        for item in self.data:
-            self.corpus.extend([item['query'][1], item['pos'][1], item['neg'][1]])
+        self.train_group_size = train_group_size
+        self.corpus = [item[key][1] for item in self.data for key in ['query', 'pos', 'neg']] # List[str]
 
     def __len__(self):
         return len(self.data)
