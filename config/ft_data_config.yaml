@@ -24,4 +24,4 @@
 
 - name: MEDI
   data_file: /data01/lizehan/embeddings/instructor-embedding/cache/medi-data/medi-data.json
-  train_group_size: 2 # useless for now
+  train_group_size: 8 # useless for now

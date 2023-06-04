@@ -10,6 +10,7 @@ import torch
 from transformers import PreTrainedTokenizer, BatchEncoding, DataCollatorWithPadding
 
 from dataset import RetrievalDataset, NLIDataset, NQDataset, MEDIDataset
+from triple_data import load_medi_data
 
 from utils import normalize_instruction
 
@@ -27,19 +28,6 @@ DATASET_CLS = {
 }
 
 
-def load_medi_data(data_path: str):
-    with open(data_path, 'r') as f:
-        training_triples = json.load(f)
-    task_to_dataset: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
-
-    for triple in training_triples:
-        task_name = triple['task_name']
-        triple['negs'] = [triple['neg']] # to be compatible with multiple negs
-        task_to_dataset[task_name].append(triple)
-    
-    return task_to_dataset
-
-
 class MultiDatasetMNKD(torch.utils.data.Dataset):
     def __init__(
         self,
@@ -54,7 +42,7 @@ class MultiDatasetMNKD(torch.utils.data.Dataset):
             else:
                 medi_data = load_medi_data(data_config['data_file']) # Dict[str, List[Dict]]
                 self.task_to_dataset.update({
-                    "{}-{}".format(task_name, task): DATASET_CLS[task_name](data)
+                    "{}-{}".format(task_name, task): DATASET_CLS[task_name](data, train_group_size=data_config['train_group_size'])
                     for task, data in medi_data.items()
                 })
 

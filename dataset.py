@@ -170,11 +170,22 @@ class NLIDataset(torch.utils.data.Dataset):
         return {"query": query, "pos": pos, "negs": negs}
 
 class MEDIDataset(torch.utils.data.Dataset):
-    def __init__(self, data: List[Any]):
-        self.data = data
-    
+    def __init__(self, data: List[Any], train_group_size: int = 16):
+        self.data: List[Dict[str, Any]] = data
+        self.corpus = [] # List[str]
+        for item in self.data:
+            self.corpus.extend([item['query'][1], item['pos'][1], item['neg'][1]])
+
     def __len__(self):
         return len(self.data)
     
     def __getitem__(self, idx):
-        return self.data[idx]
+        item = self.data[idx]
+        query = item['query'][1] # str
+        pos = item['pos'][1] # str
+        negs = [item['neg'][1]] # str
+        # random sample negatives from the corpus
+        random_negs = random.sample(self.corpus, k=self.train_group_size-2)
+        negs += random_negs
+        return {"query": query, "pos": pos, "negs": negs}
+
