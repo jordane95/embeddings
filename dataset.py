@@ -169,3 +169,12 @@ class NLIDataset(torch.utils.data.Dataset):
         negs += random_negs
         return {"query": query, "pos": pos, "negs": negs}
 
+class MEDIDataset(torch.utils.data.Dataset):
+    def __init__(self, data: List[Any]):
+        self.data = data
+    
+    def __len__(self):
+        return len(self.data)
+    
+    def __getitem__(self, idx):
+        return self.data[idx]
