@@ -26,18 +26,34 @@ DATASET_CLS = {
 }
 
 
+def load_medi_data(data_path: str, prefix: str = 'medi'):
+    with open(data_path, 'r') as f:
+        training_triples = json.load(f)
+    task_to_dataset: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
+
+    for triple in training_triples:
+        task_name = "{}-{}".format(prefix, triple['task_name'])
+        triple['negs'] = [triple['neg']] # to be compatible with multiple negs
+        task_to_dataset[task_name].append(triple)
+    
+    return task_to_dataset
+
+
 class MultiDatasetMNKD:
     def __init__(
         self,
         data_configs: List[Dict],
         batch_size: int,
     ):
+        self.task_to_dataset: Dict[str, Any] = {}
+        for data_config in data_configs:
+            task_name = data_config["name"]
+            if task_name != "MEDI":
+                self.task_to_dataset[task_name] = DATASET_CLS[task_name](data_config)
+            else:
+                medi_data = load_medi_data(data_config['data_file']) # Dict[str, List[Dict]]
+                self.task_to_dataset.update(medi_data)
 
-        self.task_to_dataset = {
-            data_config["name"]: DATASET_CLS[data_config["name"]](data_config)
-            for data_config in data_configs
-        }
-        
         self.batch_size = batch_size
 
         self.task_to_datasize: Dict[str, int] = {task: len(task_data) for task, task_data in self.task_to_dataset.items()} 
