@@ -62,6 +62,8 @@ class InfiniteMultipleIterableDataset(torch.utils.data.IterableDataset):
         query_field: str,
         doc_field: str,
         coeff: float = 0.0, # equally sample from each datasource
+        buffer_size: int = 10000,
+        seed: int = 42,
     ):
         self.batch_size = batch_size
         self.all_data_streams = []
@@ -77,7 +79,12 @@ class InfiniteMultipleIterableDataset(torch.utils.data.IterableDataset):
             data_path = os.path.join(train_dir, data_info["name"])
             data_size = int(data_info["lines"])
 
-            iterable_dataset = InfiniteIterableDataset(data_path=data_path, column_mapping=self.column_mapping)
+            iterable_dataset = InfiniteIterableDataset(
+                data_path=data_path,
+                column_mapping=self.column_mapping,
+                seed=seed,
+                buffer_size=buffer_size
+            )
             self.all_data_streams.append(iter(iterable_dataset))
             self.data_sizes.append(data_size)
         
