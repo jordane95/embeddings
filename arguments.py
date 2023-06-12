@@ -103,3 +103,4 @@ class EmbeddingTrainingArguments(TrainingArguments):
     gc_d_chunk_size: int = field(default=32)
 
     temperature: float = field(default=1.0)
+    full_contrastive_loss: bool = field(default=True)

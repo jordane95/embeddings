@@ -1,5 +1,5 @@
 
-export CUDA_VISIBLE_DEVICES=2
+export CUDA_VISIBLE_DEVICES=2,3
 
 # torchrun --nproc_per_node 2 train.py \
 # python train.py \
@@ -35,4 +35,8 @@ python train.py \
     --grad_cache False \
     --seed 42 \
     --dataloader_num_workers 1 \
+<<<<<<< HEAD
+    --full_contrastive_loss False 
+=======
     --buffer_size 100000
+>>>>>>> 3c5905bbc205ef6c5a01232e4b4b79ee6b1465ea

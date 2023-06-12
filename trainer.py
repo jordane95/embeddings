@@ -77,6 +77,7 @@ class EmbeddingTrainer(Trainer):
             temperature=self.args.temperature,
             negatives_x_device=self.args.negatives_x_device,
             loss_scale=self._dist_loss_scale_factor,
+            full_contrastive_loss=self.args.full_contrastive_loss,
         ).loss
 
     def training_step(self, *args):

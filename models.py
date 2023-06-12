@@ -122,6 +122,7 @@ class AutoModelForSentenceEmbedding(nn.Module):
         temperature: float = 1.0,
         negatives_x_device: bool = False,
         loss_scale: float = 1.0,
+        full_contrastive_loss: bool = True,
     ):
         q_embeddings = self.encode(query) # (batch_size, embedding_dim)
         d_embeddings = self.encode(doc)
@@ -137,7 +138,7 @@ class AutoModelForSentenceEmbedding(nn.Module):
             d_embeddings = dist_gather_tensor(d_embeddings)
 
 
-        scores, labels = full_contrastive_scores_and_labels(q_embeddings, d_embeddings, use_all_pairs=True)
+        scores, labels = full_contrastive_scores_and_labels(q_embeddings, d_embeddings, use_all_pairs=full_contrastive_loss)
         scores /= temperature
 
         loss = self.cross_entropy(scores, labels) * loss_scale
@@ -177,6 +178,7 @@ class AutoModelForEmbeddingTriple(AutoModelForSentenceEmbedding):
         temperature: float = 1.0,
         negatives_x_device: bool = False,
         loss_scale: float = 1.0,
+        full_contrastive_loss: bool = True,
     ):
         q_embeddings = self.encode(query) # (batch_size, embedding_dim)
         p_embeddings = self.encode(pos)
@@ -188,7 +190,7 @@ class AutoModelForEmbeddingTriple(AutoModelForSentenceEmbedding):
             n_embeddings = dist_gather_tensor(n_embeddings)
         
         d_embeddings = torch.cat([p_embeddings, n_embeddings])
-        scores, labels = full_contrastive_scores_and_labels(q_embeddings, d_embeddings, use_all_pairs=True)
+        scores, labels = full_contrastive_scores_and_labels(q_embeddings, d_embeddings, use_all_pairs=full_contrastive_loss)
         scores /= temperature
 
         loss = self.cross_entropy(scores, labels) * loss_scale
@@ -216,6 +218,7 @@ class AutoModelForEmbeddingMNKD(AutoModelForSentenceEmbedding):
         temperature: float = 1.0,
         negatives_x_device: bool = False,
         loss_scale: float = 1.0,
+        full_contrastive_loss: bool = True,
     ):
         q_embeddings = self.encode(query) # (batch_size, embedding_dim)
         p_embeddings = self.encode(pos) # (batch_size, embedding_dim)
@@ -242,7 +245,7 @@ class AutoModelForEmbeddingMNKD(AutoModelForSentenceEmbedding):
             n_embeddings = dist_gather_tensor(n_embeddings)
         
         d_embeddings = torch.cat([p_embeddings, n_embeddings])
-        scores, labels = full_contrastive_scores_and_labels(q_embeddings, d_embeddings, use_all_pairs=True)
+        scores, labels = full_contrastive_scores_and_labels(q_embeddings, d_embeddings, use_all_pairs=full_contrastive_loss)
         scores /= temperature
 
         loss = self.cross_entropy(scores, labels) * loss_scale
