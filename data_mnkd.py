@@ -9,8 +9,8 @@ import numpy as np
 import torch
 from transformers import PreTrainedTokenizer, BatchEncoding, DataCollatorWithPadding
 
-from dataset import RetrievalDataset, NLIDataset, NQDataset, MEDIDataset
-from triple_data import load_medi_data
+from dataset import RetrievalDataset, NLIDataset, NQDataset, MEDIDataset, BERRIDataset
+from dataset import load_berri_data, load_medi_data
 
 from utils import normalize_instruction
 
@@ -25,8 +25,13 @@ DATASET_CLS = {
     "NQ": NQDataset,
     "NLI": NLIDataset,
     "MEDI": MEDIDataset,
+    "BERRI": BERRIDataset,
 }
 
+LOADER_FUNC = {
+    "MEDI": load_medi_data,
+    "BERRI": load_berri_data,
+}
 
 class MultiDatasetMNKD(torch.utils.data.Dataset):
     def __init__(
@@ -37,10 +42,10 @@ class MultiDatasetMNKD(torch.utils.data.Dataset):
         self.task_to_dataset: Dict[str, Any] = {}
         for data_config in data_configs:
             task_name = data_config["name"]
-            if task_name != "MEDI":
+            if task_name not in LOADER_FUNC:
                 self.task_to_dataset[task_name] = DATASET_CLS[task_name](data_config)
             else:
-                medi_data = load_medi_data(data_config['data_file']) # Dict[str, List[Dict]]
+                multi_data = LOADER_FUNC[task_name](data_config) # Dict[str, List[Dict]]
                 self.task_to_dataset.update({
                     "{}-{}".format(task_name, task): DATASET_CLS[task_name](data, train_group_size=data_config['train_group_size'])
                     for task, data in medi_data.items()

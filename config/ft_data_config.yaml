@@ -25,3 +25,9 @@
 - name: MEDI
   data_file: /data01/lizehan/embeddings/instructor-embedding/cache/medi-data/medi-data.json
   train_group_size: 8 # useless for now
+
+
+- name: BERRI
+  data_file:
+  instruction_file:
+  train_group_size: 8

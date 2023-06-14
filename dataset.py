@@ -169,6 +169,20 @@ class NLIDataset(torch.utils.data.Dataset):
         negs += random_negs
         return {"query": query, "pos": pos, "negs": negs}
 
+
+def load_medi_data(data_config):
+    data_path = data_config['data_file']
+    with open(data_path, 'r') as f:
+        training_triples = json.load(f)
+    task_to_dataset: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
+
+    for triple in training_triples:
+        task_name = triple['task_name']
+        task_to_dataset[task_name].append(triple)
+    
+    return task_to_dataset
+
+
 class MEDIDataset(torch.utils.data.Dataset):
     def __init__(self, data: List[Any], train_group_size: int = 16):
         self.data: List[Dict[str, Any]] = data
@@ -188,3 +202,55 @@ class MEDIDataset(torch.utils.data.Dataset):
         negs += random_negs
         return {"query": query, "pos": pos, "negs": negs}
 
+
+def load_berri_data(data_config):
+    data_path: str, instruction_path: str = data_config['data_file'], data_config['instruction_file']
+    instruction_to_dataset: Dict[str, str] = {}
+    with open(instruction_path, 'r') as f:
+        headers = next(f)
+        for line in f:
+            task_name, *instructions = line.strip().split('\t')
+            for instruction in instructions:
+                instruction_to_dataset[instruction] = task_name
+    
+    task_to_dataset: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
+
+    with open(data_path, 'r') as f:
+        for line in f:
+            item = json.loads(line)
+            instruction, query = item['question'].strip().split(' [SEP] ')
+            task_name = instruction_to_dataset[instruction]
+            item['query'] = query
+            item['task'] = task_name
+            task_to_dataset[task_name].append(item)
+
+    return task_to_dataset
+
+
+class BERRIDataset(torch.utils.data.Dataset):
+    def __init__(self, data: List[Any], train_group_size: int = 16):
+        self.data: List[Dict[str, Any]] = data
+        self.train_group_size = train_group_size
+
+    def __len__(self):
+        return len(self.data)
+    
+    def verbalize_doc(self, doc: Dict[str, Any]):
+        return "{} {}".format(doc.get('title', ''), doc['text']).strip()
+    
+    def __getitem__(self, idx):
+        item = self.data[idx]
+        query = item['query'] # str
+        gold = random.choice(example["positive_ctxs"])
+        pos = self.verbalize_doc(gold)
+        negs = []
+        if len(example["hard_negative_ctxs"]) < self.train_group_size - 1:
+            negs.extend([self.verbalize_doc(neg) for neg in example["hard_negative_ctxs"]])
+            # pad to train_group_size with random negs from 'negative_ctxs' (whose amount may not be enough)
+            random_negs = random.sample(example["negative_ctxs"], k=self.train_group_size - 1 - len(negs))
+            negs.extend([self.verbalize_doc(neg) for neg in random_negs])
+        else:
+            negatives = random.choices(example["hard_negative_ctxs"], k=self.train_group_size - 1)
+            negs.extend([self.verbalize_doc(neg) for neg in negatives])
+
+        return {"query": query, "pos": pos, "negs": negs}
