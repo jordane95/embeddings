@@ -3,6 +3,7 @@ import logging
 import os
 import json
 import random
+from collections import defaultdict
 from dataclasses import dataclass
 from typing import List, Tuple, Any, Optional, Dict
 
@@ -204,7 +205,7 @@ class MEDIDataset(torch.utils.data.Dataset):
 
 
 def load_berri_data(data_config):
-    data_path: str, instruction_path: str = data_config['data_file'], data_config['instruction_file']
+    data_path, instruction_path = data_config['data_file'], data_config['instruction_file']
     instruction_to_dataset: Dict[str, str] = {}
     with open(instruction_path, 'r') as f:
         headers = next(f)
@@ -219,7 +220,7 @@ def load_berri_data(data_config):
         for line in f:
             item = json.loads(line)
             instruction, query = item['question'].strip().split(' [SEP] ')
-            task_name = instruction_to_dataset[instruction]
+            task_name = instruction_to_dataset.get(instruction, 'unk')
             item['query'] = query
             item['task'] = task_name
             task_to_dataset[task_name].append(item)
