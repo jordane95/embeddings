@@ -48,7 +48,7 @@ class MultiDatasetMNKD(torch.utils.data.Dataset):
                 multi_data = LOADER_FUNC[task_name](data_config) # Dict[str, List[Dict]]
                 self.task_to_dataset.update({
                     "{}-{}".format(task_name, task): DATASET_CLS[task_name](data, train_group_size=data_config['train_group_size'])
-                    for task, data in medi_data.items()
+                    for task, data in multi_data.items()
                 })
 
         self.batch_size = batch_size

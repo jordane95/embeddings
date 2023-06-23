@@ -242,16 +242,16 @@ class BERRIDataset(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         item = self.data[idx]
         query = item['query'] # str
-        gold = random.choice(example["positive_ctxs"])
+        gold = random.choice(item["positive_ctxs"])
         pos = self.verbalize_doc(gold)
         negs = []
-        if len(example["hard_negative_ctxs"]) < self.train_group_size - 1:
-            negs.extend([self.verbalize_doc(neg) for neg in example["hard_negative_ctxs"]])
+        if len(item["hard_negative_ctxs"]) < self.train_group_size - 1:
+            negs.extend([self.verbalize_doc(neg) for neg in item["hard_negative_ctxs"]])
             # pad to train_group_size with random negs from 'negative_ctxs' (whose amount may not be enough)
-            random_negs = random.sample(example["negative_ctxs"], k=self.train_group_size - 1 - len(negs))
+            random_negs = random.choices(item["negative_ctxs"], k=self.train_group_size - 1 - len(negs))
             negs.extend([self.verbalize_doc(neg) for neg in random_negs])
         else:
-            negatives = random.choices(example["hard_negative_ctxs"], k=self.train_group_size - 1)
+            negatives = random.sample(item["hard_negative_ctxs"], k=self.train_group_size - 1)
             negs.extend([self.verbalize_doc(neg) for neg in negatives])
 
         return {"query": query, "pos": pos, "negs": negs}

@@ -28,7 +28,10 @@ TRAINING_ARGS_NAME = "training_args.bin"
 class EmbeddingTrainer(Trainer):
     def __init__(self, *args, **kwargs):
         super(EmbeddingTrainer, self).__init__(*args, **kwargs)
-        self._dist_loss_scale_factor = dist.get_world_size() if self.args.negatives_x_device and dist.is_initialized() else 1
+        self._dist_loss_scale_factor = 1.0
+        if self.args.negatives_x_device and dist.is_initialized():
+            self._dist_loss_scale_factor = dist.get_world_size() if self.args.loss_scale<=0 else self.args.loss_scale
+        logger.info(f"Using loss scale: {self._dist_loss_scale_factor}")
 
     def _get_train_sampler(self) -> Optional[torch.utils.data.Sampler]:
         if self.train_dataset is None or not has_length(self.train_dataset):

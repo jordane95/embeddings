@@ -104,3 +104,5 @@ class EmbeddingTrainingArguments(TrainingArguments):
 
     temperature: float = field(default=1.0)
     full_contrastive_loss: bool = field(default=True)
+
+    loss_scale: float = field(default=-1., metadata={"help": "loss scale, -1 will use world_size"})
