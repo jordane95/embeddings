@@ -32,6 +32,8 @@ class EmbeddingTrainer(Trainer):
         if self.args.negatives_x_device and dist.is_initialized():
             self._dist_loss_scale_factor = dist.get_world_size() if self.args.loss_scale<=0 else self.args.loss_scale
         logger.info(f"Using loss scale: {self._dist_loss_scale_factor}")
+        self._warmup_steps = self.args.get_warmup_steps(self.args.max_steps)
+        logger.info(f"Warmup steps: {self._warmup_steps}")
 
     def _get_train_sampler(self) -> Optional[torch.utils.data.Sampler]:
         if self.train_dataset is None or not has_length(self.train_dataset):
@@ -75,16 +77,21 @@ class EmbeddingTrainer(Trainer):
         torch.save(self.args, os.path.join(output_dir, TRAINING_ARGS_NAME))
 
     def compute_loss(self, model, inputs):
+        disable_x_device = self.args.contrastive_warmup and (self.state.global_step <= self._warmup_steps)
+        negatives_x_device = self.args.negatives_x_device and not disable_x_device
         return model(
             **inputs,
             temperature=self.args.temperature,
-            negatives_x_device=self.args.negatives_x_device,
-            loss_scale=self._dist_loss_scale_factor,
+            negatives_x_device=negatives_x_device,
+            loss_scale=self._dist_loss_scale_factor if negatives_x_device else 1.0,
             full_contrastive_loss=self.args.full_contrastive_loss,
         ).loss
 
     def training_step(self, *args):
-        return super(EmbeddingTrainer, self).training_step(*args) / self._dist_loss_scale_factor
+        disable_x_device = self.args.contrastive_warmup and (self.state.global_step <= self._warmup_steps)
+        negatives_x_device = self.args.negatives_x_device and not disable_x_device
+        loss_scale_factor = self._dist_loss_scale_factor if negatives_x_device else 1.0
+        return super(EmbeddingTrainer, self).training_step(*args) / loss_scale_factor
 
 
 def split_dense_inputs(model_input: dict, chunk_size: int):

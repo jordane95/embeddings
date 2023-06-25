@@ -31,9 +31,9 @@ torchrun --nproc_per_node 2 train.py \
     --add_prompt \
     --q_max_len 128 \
     --d_max_len 128 \
-    --max_steps 50000 \
+    --max_steps 100 \
     --learning_rate 2e-5 \
-    --logging_steps 10 \
+    --logging_steps 2 \
     --save_steps 500 \
     --warmup_ratio 0.05 \
     --per_device_train_batch_size 256 \
@@ -45,4 +45,4 @@ torchrun --nproc_per_node 2 train.py \
     --grad_cache False \
     --seed 42 \
     --dataloader_num_workers 1 \
-    --loss_scale 1
+    --contrastive_warmup
