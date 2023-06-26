@@ -45,4 +45,5 @@ torchrun --nproc_per_node 2 train.py \
     --grad_cache False \
     --seed 42 \
     --dataloader_num_workers 1 \
-    --contrastive_warmup
+    --contrastive_warmup \
+    --t_warmup

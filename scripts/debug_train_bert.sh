@@ -35,8 +35,5 @@ python train.py \
     --grad_cache False \
     --seed 42 \
     --dataloader_num_workers 1 \
-<<<<<<< HEAD
-    --full_contrastive_loss False 
-=======
+    --full_contrastive_loss False \
     --buffer_size 100000
->>>>>>> 3c5905bbc205ef6c5a01232e4b4b79ee6b1465ea

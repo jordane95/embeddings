@@ -79,9 +79,10 @@ class EmbeddingTrainer(Trainer):
     def compute_loss(self, model, inputs):
         disable_x_device = self.args.contrastive_warmup and (self.state.global_step <= self._warmup_steps)
         negatives_x_device = self.args.negatives_x_device and not disable_x_device
+        temperature = max(self.args.temperature, 1 - self.state.global_step / self._warmup_steps) if self.args.t_warmup else self.args.temperature
         return model(
             **inputs,
-            temperature=self.args.temperature,
+            temperature=temperature,
             negatives_x_device=negatives_x_device,
             loss_scale=self._dist_loss_scale_factor if negatives_x_device else 1.0,
             full_contrastive_loss=self.args.full_contrastive_loss,

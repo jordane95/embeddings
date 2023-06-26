@@ -104,6 +104,7 @@ class EmbeddingTrainingArguments(TrainingArguments):
     gc_d_chunk_size: int = field(default=32)
 
     temperature: float = field(default=1.0)
+    t_warmup: bool = field(default=False, metadata={"help": "Linear temperature warmup."})
     full_contrastive_loss: bool = field(default=True)
 
     loss_scale: float = field(default=-1., metadata={"help": "loss scale, -1 will use world_size"})
