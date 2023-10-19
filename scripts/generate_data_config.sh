@@ -1,6 +1,7 @@
 
 
-DATA_PATH='/data01/lizehan/proqa/pls'
+DATA_PATH=$1 # Path to data directory
+CONFIG_PATH=$2 # Path to save data config
 
 
 function count () {
@@ -22,5 +23,6 @@ function write () {
         } )'
 }
 
-write > config/data_config.json
+write > $CONFIG_PATH
+
 

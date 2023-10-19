@@ -1,0 +1,5 @@
+
+
+- name: POJ104
+  data_file: /data01/lizehan/proqa/code/CodeXGLUE/Code-Code/Clone-detection-POJ-104/dataset/train.jsonl
+  train_group_size: 8

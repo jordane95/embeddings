@@ -1,0 +1,5 @@
+- name: CodeSearchNet
+  data_path: /data01/lizehan/proqa/CodeBERT/GraphCodeBERT/codesearch/dataset/{}/train.jsonl
+  langs:
+    - java
+  train_group_size: 8

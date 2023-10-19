@@ -28,6 +28,5 @@
 
 
 - name: BERRI
-  data_file:
-  instruction_file:
+  data_path: /data01/lizehan/proqa/pretrain_data/codesearchnet_{}_docstring_code.jsonl
   train_group_size: 8

@@ -1,0 +1,3 @@
+- name: SQL
+  data_file: /data01/lizehan/proqa/code/CDCS/dataset/train_valid/SQL/train.txt
+  train_group_size: 8

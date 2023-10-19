@@ -109,6 +109,9 @@ def main():
         cache_dir=model_args.cache_dir
     )
     tokenizer.padding_side = 'right'
+    if not tokenizer.pad_token:
+        tokenizer.pad_token = tokenizer.eos_token
+    
     model = AutoModelForSentenceEmbedding(
         model_args.model_name_or_path,
         pooling=model_args.pooling,

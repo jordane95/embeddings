@@ -9,8 +9,17 @@ import numpy as np
 import torch
 from transformers import PreTrainedTokenizer, BatchEncoding, DataCollatorWithPadding
 
-from dataset import RetrievalDataset, NLIDataset, NQDataset, MEDIDataset, BERRIDataset
-from dataset import load_berri_data, load_medi_data
+from dataset import RetrievalDataset, NLIDataset, NQDataset, MEDIDataset, BERRIDataset, CodeSearchNetDataset
+from dataset import CoSQADataset, CoNaLaDataset, AdvDataset, StaQCDataset, SODSDataset, POJ104Dataset
+from dataset import load_berri_data, load_medi_data, load_code_search_net_data
+
+from dataset import CodeSearchNetRemoveDataset, AdvRemoveDataset
+from dataset import CodeSearchNetTokenDataset, AdvTokenDataset
+from dataset import CodeSearchNetCleanDataset, AdvCleanDataset
+
+from dataset import AdvRemoveDocDataset, CodeSearchNetRemoveDocDataset
+
+from dataset import SolidityDataset, SQLDataset
 
 from utils import normalize_instruction
 
@@ -26,11 +35,33 @@ DATASET_CLS = {
     "NLI": NLIDataset,
     "MEDI": MEDIDataset,
     "BERRI": BERRIDataset,
+    "CodeSearchNet": CodeSearchNetDataset,
+    "CoNaLa": CoNaLaDataset,
+    "Adv": AdvDataset,
+    "SO-DS": SODSDataset,
+    "CoSQA": CoSQADataset,
+    "StaQC": StaQCDataset,
+    "POJ104": POJ104Dataset,
+    "AdvRemove": AdvRemoveDataset,
+    "CodeSearchNetRemove": CodeSearchNetRemoveDataset,
+    "AdvToken": AdvTokenDataset,
+    "CodeSearchNetToken": CodeSearchNetTokenDataset,
+    "AdvClean": AdvCleanDataset,
+    "CodeSearchNetClean": CodeSearchNetCleanDataset,
+    "AdvRemoveDoc": AdvRemoveDocDataset,
+    "CodeSearchNetRemoveDoc": CodeSearchNetRemoveDocDataset,
+    "Solidity": SolidityDataset,
+    "SQL": SQLDataset,
 }
 
 LOADER_FUNC = {
     "MEDI": load_medi_data,
     "BERRI": load_berri_data,
+    "CodeSearchNet": load_code_search_net_data,
+    "CodeSearchNetToken": load_code_search_net_data,
+    "CodeSearchNetRemove": load_code_search_net_data,
+    "CodeSearchNetClean": load_code_search_net_data,
+    "CodeSearchNetRemoveDoc": load_code_search_net_data,
 }
 
 class MultiDatasetMNKD(torch.utils.data.Dataset):
@@ -47,7 +78,7 @@ class MultiDatasetMNKD(torch.utils.data.Dataset):
             else:
                 multi_data = LOADER_FUNC[task_name](data_config) # Dict[str, List[Dict]]
                 self.task_to_dataset.update({
-                    "{}-{}".format(task_name, task): DATASET_CLS[task_name](data, train_group_size=data_config['train_group_size'])
+                    "{}-{}".format(task_name, task): DATASET_CLS[task_name](data, train_group_size=data_config['train_group_size'], task=task)
                     for task, data in multi_data.items()
                 })
 

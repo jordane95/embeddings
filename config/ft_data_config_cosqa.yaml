@@ -1,0 +1,4 @@
+
+- name: CoSQA
+  data_file: /data01/lizehan/proqa/code/CoCLR/data/search/cosqa-retrieval-train-19604.json
+  train_group_size: 8

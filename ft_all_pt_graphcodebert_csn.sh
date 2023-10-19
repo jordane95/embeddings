@@ -1,0 +1,4 @@
+
+bash ft_csn_all_pt_graphcodebert_csn.sh
+
+bash ft_cs_other_pt_graphcodebert_csn.sh

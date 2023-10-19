@@ -1,0 +1,10 @@
+- name: CodeSearchNet
+  data_path: /data01/lizehan/proqa/pretrain_data/codesearchnet_{}_docstring_code.jsonl
+  langs:
+    - python
+    - java
+    - go
+    - php
+    - ruby
+    - javascript
+  train_group_size: 8

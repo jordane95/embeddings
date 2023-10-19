@@ -1,0 +1,5 @@
+- data_path: /data01/lizehan/proqa/CodeBERT/GraphCodeBERT/codesearch/dataset/{}/train.jsonl
+  langs:
+  - python
+  name: CodeSearchNetClean
+  train_group_size: 8

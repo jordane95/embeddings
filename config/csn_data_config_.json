@@ -1,0 +1,26 @@
+[
+  {
+    "name": "codesearchnet_go_docstring_code.jsonl",
+    "lines": 317832
+  },
+  {
+    "name": "codesearchnet_java_docstring_code.jsonl",
+    "lines": 454451
+  },
+  {
+    "name": "codesearchnet_javascript_docstring_code.jsonl",
+    "lines": 123889
+  },
+  {
+    "name": "codesearchnet_php_docstring_code.jsonl",
+    "lines": 523712
+  },
+  {
+    "name": "codesearchnet_python_docstring_code.jsonl",
+    "lines": 412178
+  },
+  {
+    "name": "codesearchnet_ruby_docstring_code.jsonl",
+    "lines": 48791
+  }
+]

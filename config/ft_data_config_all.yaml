@@ -1,0 +1,34 @@
+- name: CodeSearchNet
+  data_path: /data01/lizehan/proqa/CodeBERT/GraphCodeBERT/codesearch/dataset/{}/train.jsonl
+  langs:
+    - python
+    - java
+    - go
+    - php
+    - ruby
+    - javascript
+  train_group_size: 8
+
+- name: Adv
+  data_file: /data01/lizehan/proqa/code/CodeXGLUE/Text-Code/NL-code-search-Adv/dataset/train.jsonl
+  train_group_size: 8
+
+- name: CoSQA
+  data_file: /data01/lizehan/proqa/code/CoCLR/data/search/cosqa-retrieval-train-19604.json
+  train_group_size: 8
+
+- name: CoNaLa
+  data_file: /data01/lizehan/proqa/raw_data/conala/conala-curated-snippets.jsonl 
+  train_group_size: 8
+
+- name: SO-DS
+  data_file: /data01/lizehan/proqa/raw_data/so-ds/so-ds-feb20.jsonl
+  train_group_size: 8
+
+- name: StaQC
+  data_file: /data01/lizehan/proqa/raw_data/staqc/staqc-py-cleaned.jsonl
+  train_group_size: 8
+
+- name: POJ104
+  data_file: /data01/lizehan/proqa/code/CodeXGLUE/Code-Code/Clone-detection-POJ-104/dataset/train.jsonl
+  train_group_size: 8

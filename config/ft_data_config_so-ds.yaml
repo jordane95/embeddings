@@ -1,0 +1,3 @@
+- name: SO-DS
+  data_file: /data01/lizehan/proqa/raw_data/so-ds/so-ds-feb20.jsonl
+  train_group_size: 8

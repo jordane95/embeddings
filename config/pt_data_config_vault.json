@@ -1,0 +1,110 @@
+[
+  {
+    "name": "thevault_c#_comment_code.jsonl",
+    "lines": 6274389
+  },
+  {
+    "name": "thevault_c++_comment_code.jsonl",
+    "lines": 10343650
+  },
+  {
+    "name": "thevault_c_comment_code.jsonl",
+    "lines": 6778329
+  },
+  {
+    "name": "thevault_c#_docstring_class.jsonl",
+    "lines": 1437800
+  },
+  {
+    "name": "thevault_c#_docstring_function.jsonl",
+    "lines": 3305891
+  },
+  {
+    "name": "thevault_c++_docstring_function.jsonl",
+    "lines": 1671268
+  },
+  {
+    "name": "thevault_c_docstring_function.jsonl",
+    "lines": 1639319
+  },
+  {
+    "name": "thevault_go_comment_code.jsonl",
+    "lines": 4390342
+  },
+  {
+    "name": "thevault_go_docstring_function.jsonl",
+    "lines": 5109020
+  },
+  {
+    "name": "thevault_java_comment_code.jsonl",
+    "lines": 17062277
+  },
+  {
+    "name": "thevault_java_docstring_class.jsonl",
+    "lines": 4872485
+  },
+  {
+    "name": "thevault_java_docstring_function.jsonl",
+    "lines": 6629193
+  },
+  {
+    "name": "thevault_javascript_comment_code.jsonl",
+    "lines": 1438110
+  },
+  {
+    "name": "thevault_javascript_docstring_class.jsonl",
+    "lines": 291479
+  },
+  {
+    "name": "thevault_javascript_docstring_function.jsonl",
+    "lines": 1640416
+  },
+  {
+    "name": "thevault_php_comment_code.jsonl",
+    "lines": 5873744
+  },
+  {
+    "name": "thevault_php_docstring_class.jsonl",
+    "lines": 1173916
+  },
+  {
+    "name": "thevault_php_docstring_function.jsonl",
+    "lines": 4656371
+  },
+  {
+    "name": "thevault_python_comment_code.jsonl",
+    "lines": 14013238
+  },
+  {
+    "name": "thevault_python_docstring_class.jsonl",
+    "lines": 422187
+  },
+  {
+    "name": "thevault_python_docstring_function.jsonl",
+    "lines": 7772647
+  },
+  {
+    "name": "thevault_ruby_comment_code.jsonl",
+    "lines": 767563
+  },
+  {
+    "name": "thevault_ruby_docstring_class.jsonl",
+    "lines": 353859
+  },
+  {
+    "name": "thevault_ruby_docstring_function.jsonl",
+    "lines": 424339
+  },
+  {
+    "name": "thevault_rust_comment_code.jsonl",
+    "lines": 2063784
+  },
+  {
+    "name": "thevault_rust_docstring_class.jsonl",
+    "lines": 93311
+  },
+  {
+    "name": "thevault_rust_docstring_function.jsonl",
+    "lines": 825130
+  }
+]

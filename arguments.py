@@ -46,7 +46,7 @@ class DataArguments:
 
     data_config: str = field(default="config/data_config.json")
 
-    mix_coefficient: float = field(default=0.0)
+    mix_coefficient: float = field(default=0.5)
     buffer_size: int = field(default=10000)
 
     query_column: Optional[str] = field(

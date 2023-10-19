@@ -2,6 +2,7 @@ debug/
 ckpt/
 data/
 cache/
+results*/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

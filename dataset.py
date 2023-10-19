@@ -11,6 +11,8 @@ import datasets
 from datasets import load_dataset
 import torch
 
+from utils import remove_comments_and_docstrings
+
 def read_mapping_id(id_file):
     id_dict = {}
     for line in open(id_file, encoding='utf-8'):
@@ -185,7 +187,7 @@ def load_medi_data(data_config):
 
 
 class MEDIDataset(torch.utils.data.Dataset):
-    def __init__(self, data: List[Any], train_group_size: int = 16):
+    def __init__(self, data: List[Any], train_group_size: int = 16, task: str = 'nq'):
         self.data: List[Dict[str, Any]] = data
         self.train_group_size = train_group_size
         self.corpus = [item[key][1] for item in self.data for key in ['query', 'pos', 'neg']] # List[str]
@@ -229,7 +231,7 @@ def load_berri_data(data_config):
 
 
 class BERRIDataset(torch.utils.data.Dataset):
-    def __init__(self, data: List[Any], train_group_size: int = 16):
+    def __init__(self, data: List[Any], train_group_size: int = 16, task: str = 'nq'):
         self.data: List[Dict[str, Any]] = data
         self.train_group_size = train_group_size
 
@@ -255,3 +257,338 @@ class BERRIDataset(torch.utils.data.Dataset):
             negs.extend([self.verbalize_doc(neg) for neg in negatives])
 
         return {"query": query, "pos": pos, "negs": negs}
+
+
+
+
+def remove_lang(lang: str = 'python'):
+    def remove_lang_(item):
+        try:
+            item['code'] = remove_comments_and_docstrings(item['code'], lang)
+        except:
+            print("found bug in code.")
+        return item
+    return remove_lang_
+
+def clean_lang(lang: str = 'python'):
+    def clean_lang_(item):
+        try:
+            item['code'] = ' '.join(remove_comments_and_docstrings(item['code'], lang).split())
+        except:
+            print("found bug in code.")
+        return item
+    return clean_lang_
+
+
+def load_code_search_net_data(data_config):
+    langs = data_config['langs']
+    data_path = data_config['data_path']
+    
+    all_lang_data = {}
+    for lang in langs:
+        # data = []
+        # with open(data_path.format(lang), 'r') as f:
+        #     for line in f:
+        #         item = json.loads(line)
+        #         data.append(item)
+        data = load_dataset('json', data_files=data_path.format(lang), split='train', cache_dir='cache')
+        all_lang_data[lang] = data
+    return all_lang_data
+
+
+class CodeSearchNetDataset(torch.utils.data.Dataset):
+    def __init__(self, data: List[Any], train_group_size: int = 16):
+        self.data: List[Dict[str, Any]] = data
+        self.train_group_size = train_group_size
+        self.code_corpus = [item['code'] for item in self.data]
+    
+    def __len__(self):
+        return len(self.data)
+    
+    def __getitem__(self, idx):
+        item = self.data[idx]
+        query = item['docstring'] # str
+        pos = item['code'] # str
+        negs = []
+        if len(self.code_corpus) < self.train_group_size - 1:
+            negs.extend(random.choices(self.code_corpus, k=self.train_group_size - 1))
+        else:
+            negs.extend(random.sample(self.code_corpus, k=self.train_group_size - 1))
+            
+        return {"query": query, "pos": pos, "negs": negs}
+
+
+class CodeSearchNetTokenDataset(torch.utils.data.Dataset):
+    def __init__(self, data: List[Any], train_group_size: int = 16, task: str = 'python'):
+        self.data: List[Dict[str, Any]] = data
+        self.train_group_size = train_group_size
+        self.task = task
+        self.code_corpus = [' '.join(item['code_tokens']) for item in self.data]
+    
+    def __len__(self):
+        return len(self.data)
+    
+    def __getitem__(self, idx):
+        item = self.data[idx]
+        query = ' '.join(item['docstring_tokens']) # str
+        pos = ' '.join(item['code_tokens']) # str
+        negs = []
+        if len(self.code_corpus) < self.train_group_size - 1:
+            negs.extend(random.choices(self.code_corpus, k=self.train_group_size - 1))
+        else:
+            negs.extend(random.sample(self.code_corpus, k=self.train_group_size - 1))
+            
+        return {"query": query, "pos": pos, "negs": negs}
+
+
+class CodeSearchNetRemoveDataset(torch.utils.data.Dataset):
+    def __init__(self, data: List[Any], train_group_size: int = 16, task: str = 'python'):
+        self.dataset: List[Dict[str, Any]] = data.map(remove_lang(task))
+        self.train_group_size = train_group_size
+        self.code_corpus = [item['code'] for item in self.dataset]
+    
+    def __len__(self):
+        return len(self.dataset)
+    
+    def __getitem__(self, idx):
+        item = self.dataset[idx]
+        # query = ' '.join(item['docstring_tokens']) # str
+        query = item['docstring']
+        # pos = ' '.join(item['code_tokens']) # str
+        pos = item['code']
+        negs = []
+        if len(self.code_corpus) < self.train_group_size - 1:
+            negs.extend(random.choices(self.code_corpus, k=self.train_group_size - 1))
+        else:
+            negs.extend(random.sample(self.code_corpus, k=self.train_group_size - 1))
+            
+        return {"query": query, "pos": pos, "negs": negs}
+
+
+class CodeSearchNetRemoveDocDataset(torch.utils.data.Dataset):
+    def __init__(self, data: List[Any], train_group_size: int = 16, task: str = 'python'):
+        self.dataset: List[Dict[str, Any]] = data.map(remove_lang(task))
+        self.train_group_size = train_group_size
+        self.code_corpus = [item['code'] for item in self.dataset]
+    
+    def __len__(self):
+        return len(self.dataset)
+    
+    def __getitem__(self, idx):
+        item = self.dataset[idx]
+        # query = ' '.join(item['docstring_tokens']) # str
+        query = ' '.join(item['docstring'].split('\n\n')[0].split())
+        # pos = ' '.join(item['code_tokens']) # str
+        pos = item['code']
+        negs = []
+        if len(self.code_corpus) < self.train_group_size - 1:
+            negs.extend(random.choices(self.code_corpus, k=self.train_group_size - 1))
+        else:
+            negs.extend(random.sample(self.code_corpus, k=self.train_group_size - 1))
+            
+        return {"query": query, "pos": pos, "negs": negs}
+
+class CodeSearchNetCleanDataset(CodeSearchNetRemoveDataset):
+    def __init__(self, data: List[Any], train_group_size: int = 16, task: str = 'python'):
+        self.dataset: List[Dict[str, Any]] = data.map(clean_lang(task))
+        self.train_group_size = train_group_size
+        self.code_corpus = [item['code'] for item in self.dataset]
+
+
+class AdvDataset(torch.utils.data.Dataset):
+    def __init__(self, data_config: Dict[str, Any]):
+        self.dataset = load_dataset('json', data_files=data_config['data_file'], split='train', cache_dir='cache')
+        self.train_group_size = data_config['train_group_size']
+        self.code_corpus = [item['code'] for item in self.dataset]
+    
+    def __len__(self):
+        return len(self.dataset)
+    
+    def __getitem__(self, idx):
+        item = self.dataset[idx]
+        query = item['docstring'] # str
+        pos = item['code'] # str
+        negs = []
+        if len(self.code_corpus) < self.train_group_size - 1:
+            negs.extend(random.choices(self.code_corpus, k=self.train_group_size - 1))
+        else:
+            negs.extend(random.sample(self.code_corpus, k=self.train_group_size - 1))
+            
+        return {"query": query, "pos": pos, "negs": negs}
+
+
+class AdvTokenDataset(torch.utils.data.Dataset):
+    def __init__(self, data_config: Dict[str, Any]):
+        self.dataset = load_dataset('json', data_files=data_config['data_file'], split='train', cache_dir='cache')
+        self.train_group_size = data_config['train_group_size']
+        self.code_corpus = [' '.join(item['code_tokens']) for item in self.dataset]
+    
+    def __len__(self):
+        return len(self.dataset)
+    
+    def __getitem__(self, idx):
+        item = self.dataset[idx]
+        query = ' '.join(item['docstring_tokens']) # str
+        pos = ' '.join(item['code_tokens']) # str
+        negs = []
+        if len(self.code_corpus) < self.train_group_size - 1:
+            negs.extend(random.choices(self.code_corpus, k=self.train_group_size - 1))
+        else:
+            negs.extend(random.sample(self.code_corpus, k=self.train_group_size - 1))
+            
+        return {"query": query, "pos": pos, "negs": negs}
+
+
+class AdvRemoveDataset(torch.utils.data.Dataset):
+    def __init__(self, data_config: Dict[str, Any]):
+        self.dataset = load_dataset('json', data_files=data_config['data_file'], split='train', cache_dir='cache')
+        self.dataset = self.dataset.map(remove_lang('python'))
+        self.train_group_size = data_config['train_group_size']
+        self.code_corpus = [item['code'] for item in self.dataset]
+    
+    def __len__(self):
+        return len(self.dataset)
+    
+    def __getitem__(self, idx):
+        item = self.dataset[idx]
+        query = item['docstring']
+        pos = item['code']
+        negs = []
+        if len(self.code_corpus) < self.train_group_size - 1:
+            negs.extend(random.choices(self.code_corpus, k=self.train_group_size - 1))
+        else:
+            negs.extend(random.sample(self.code_corpus, k=self.train_group_size - 1))
+            
+        return {"query": query, "pos": pos, "negs": negs}
+
+class AdvRemoveDocDataset(torch.utils.data.Dataset):
+    def __init__(self, data_config: Dict[str, Any]):
+        self.dataset = load_dataset('json', data_files=data_config['data_file'], split='train', cache_dir='cache')
+        self.dataset = self.dataset.map(remove_lang('python'))
+        self.train_group_size = data_config['train_group_size']
+        self.code_corpus = [item['code'] for item in self.dataset]
+    
+    def __len__(self):
+        return len(self.dataset)
+    
+    def __getitem__(self, idx):
+        item = self.dataset[idx]
+        query = ' '.join(item['docstring'].split('\n\n')[0].split())
+        pos = item['code']
+        negs = []
+        if len(self.code_corpus) < self.train_group_size - 1:
+            negs.extend(random.choices(self.code_corpus, k=self.train_group_size - 1))
+        else:
+            negs.extend(random.sample(self.code_corpus, k=self.train_group_size - 1))
+            
+        return {"query": query, "pos": pos, "negs": negs}
+
+class AdvCleanDataset(AdvRemoveDataset):
+    def __init__(self, data_config: Dict[str, Any]):
+        self.dataset = load_dataset('json', data_files=data_config['data_file'], split='train', cache_dir='cache')
+        self.dataset = self.dataset.map(clean_lang('python'))
+        self.train_group_size = data_config['train_group_size']
+        self.code_corpus = [item['code'] for item in self.dataset]
+
+
+class CoSQADataset(torch.utils.data.Dataset):
+    def __init__(self, data_config: Dict[str, Any]):
+        self.dataset = load_dataset('json', data_files=data_config['data_file'], split='train', cache_dir='cache')
+        self.train_group_size = data_config['train_group_size']
+        self.code_corpus = [item['code'] for item in self.dataset]
+    
+    def __len__(self):
+        return len(self.dataset)
+    
+    def __getitem__(self, idx):
+        item = self.dataset[idx]
+        query = item['doc'] # str
+        pos = item['code'] # str
+        negs = []
+        if len(self.code_corpus) < self.train_group_size - 1:
+            negs.extend(random.choices(self.code_corpus, k=self.train_group_size - 1))
+        else:
+            negs.extend(random.sample(self.code_corpus, k=self.train_group_size - 1))
+            
+        return {"query": query, "pos": pos, "negs": negs}
+
+
+class CoNaLaDataset(torch.utils.data.Dataset):
+    def __init__(self, data_config: Dict[str, Any]):
+        self.dataset = load_dataset('json', data_files=data_config['data_file'], split='train', cache_dir='cache')
+        self.train_group_size = data_config['train_group_size']
+        self.code_corpus = [item['code'] for item in self.dataset]
+    
+    def __len__(self):
+        return len(self.dataset)
+    
+    def __getitem__(self, idx):
+        item = self.dataset[idx]
+        query = item['description'] # str
+        pos = item['code'] # str
+        negs = []
+        if len(self.code_corpus) < self.train_group_size - 1:
+            negs.extend(random.choices(self.code_corpus, k=self.train_group_size - 1))
+        else:
+            negs.extend(random.sample(self.code_corpus, k=self.train_group_size - 1))
+            
+        return {"query": query, "pos": pos, "negs": negs}
+
+SODSDataset = CoNaLaDataset
+StaQCDataset = CoNaLaDataset
+
+
+class POJ104Dataset(torch.utils.data.Dataset):
+    def __init__(self, data_config: Dict[str, Any]):
+        self.dataset = load_dataset('json', data_files=data_config["data_file"], split='train', cache_dir='cache')
+        self.train_group_size = data_config['train_group_size']
+
+        self.problem_solutions = defaultdict(list)
+        for item in self.dataset:
+            self.problem_solutions[item['label']].append(item)
+
+    def __len__(self):
+        return len(self.dataset)
+    
+    def __getitem__(self, idx):
+        item = self.dataset[idx]
+        label = item['label']
+        index = item['index']
+        labels = list(self.problem_solutions)
+        labels.remove(label)
+        while True:
+            shuffle_example = random.choice(self.problem_solutions[label])
+            if shuffle_example['index'] != index:
+                p_example = shuffle_example
+                break
+        n_examples = [random.choice(self.problem_solutions[random.choice(labels)]) for _ in range(self.train_group_size-1)]
+        return {"query": item['code'], "pos": p_example['code'], "negs": [n_example['code'] for n_example in n_examples]}
+
+class SolidityDataset(torch.utils.data.Dataset):
+    def __init__(self, data_config: Dict[str, Any]):
+        self.dataset = []
+        self.code_corpus = []
+        with open(data_config["data_file"], 'r') as f:
+            for line in f:
+                idx, url, func_name, text, code = line.strip().split('<CODESPLIT>')
+                item = {"text": text, "code": code}
+                self.dataset.append(item)
+                self.code_corpus.append(code)
+        self.train_group_size = data_config['train_group_size']
+    
+    def __len__(self):
+        return len(self.dataset)
+    
+    def __getitem__(self, idx):
+        item = self.dataset[idx]
+        query = item['text']
+        pos = item['code']
+        negs = []
+        if len(self.code_corpus) < self.train_group_size - 1:
+            negs.extend(random.choices(self.code_corpus, k=self.train_group_size - 1))
+        else:
+            negs.extend(random.sample(self.code_corpus, k=self.train_group_size - 1))
+        return {"query": query, "pos": pos, "negs": negs}
+
+
+SQLDataset = SolidityDataset

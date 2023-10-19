@@ -1,0 +1,4 @@
+
+- name: StaQC
+  data_file: /data01/lizehan/proqa/raw_data/staqc/staqc-py-cleaned.jsonl
+  train_group_size: 8

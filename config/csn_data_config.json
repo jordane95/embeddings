@@ -1,0 +1,26 @@
+[
+  {
+    "name": "csntoken_go_docstring_code.jsonl",
+    "lines": 317832
+  },
+  {
+    "name": "csntoken_java_docstring_code.jsonl",
+    "lines": 454451
+  },
+  {
+    "name": "csntoken_javascript_docstring_code.jsonl",
+    "lines": 123889
+  },
+  {
+    "name": "csntoken_php_docstring_code.jsonl",
+    "lines": 523712
+  },
+  {
+    "name": "csntoken_python_docstring_code.jsonl",
+    "lines": 412178
+  },
+  {
+    "name": "csntoken_ruby_docstring_code.jsonl",
+    "lines": 48791
+  }
+]

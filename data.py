@@ -77,7 +77,7 @@ class InfiniteMultipleIterableDataset(torch.utils.data.IterableDataset):
 
         for i, data_info in enumerate(data_config):
             data_path = os.path.join(train_dir, data_info["name"])
-            data_size = int(data_info["lines"])
+            data_size = float(data_info["lines"])
 
             iterable_dataset = InfiniteIterableDataset(
                 data_path=data_path,

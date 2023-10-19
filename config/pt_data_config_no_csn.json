@@ -1,0 +1,162 @@
+[
+  {
+    "name": "stackoverflow_c#_question_answer.jsonl",
+    "lines": 654376
+  },
+  {
+    "name": "stackoverflow_c++_question_answer.jsonl",
+    "lines": 334677
+  },
+  {
+    "name": "stackoverflow_c_question_answer.jsonl",
+    "lines": 163797
+  },
+  {
+    "name": "stackoverflow_c#_question_description.jsonl",
+    "lines": 654376
+  },
+  {
+    "name": "stackoverflow_c++_question_description.jsonl",
+    "lines": 334677
+  },
+  {
+    "name": "stackoverflow_c_question_description.jsonl",
+    "lines": 163797
+  },
+  {
+    "name": "stackoverflow_go_question_answer.jsonl",
+    "lines": 28809
+  },
+  {
+    "name": "stackoverflow_go_question_description.jsonl",
+    "lines": 28809
+  },
+  {
+    "name": "stackoverflow_java_question_answer.jsonl",
+    "lines": 665358
+  },
+  {
+    "name": "stackoverflow_java_question_description.jsonl",
+    "lines": 665358
+  },
+  {
+    "name": "stackoverflow_javascript_question_answer.jsonl",
+    "lines": 973676
+  },
+  {
+    "name": "stackoverflow_javascript_question_description.jsonl",
+    "lines": 973676
+  },
+  {
+    "name": "stackoverflow_php_question_answer.jsonl",
+    "lines": 567357
+  },
+  {
+    "name": "stackoverflow_php_question_description.jsonl",
+    "lines": 567357
+  },
+  {
+    "name": "stackoverflow_python_question_answer.jsonl",
+    "lines": 806782
+  },
+  {
+    "name": "stackoverflow_python_question_description.jsonl",
+    "lines": 806782
+  },
+  {
+    "name": "stackoverflow_ruby_question_answer.jsonl",
+    "lines": 104974
+  },
+  {
+    "name": "stackoverflow_ruby_question_description.jsonl",
+    "lines": 104974
+  },
+  {
+    "name": "stackoverflow_rust_question_answer.jsonl",
+    "lines": 15514
+  },
+  {
+    "name": "stackoverflow_rust_question_description.jsonl",
+    "lines": 15514
+  },
+  {
+    "name": "thevault_c#_comment_code.jsonl",
+    "lines": 6274389
+  },
+  {
+    "name": "thevault_c++_comment_code.jsonl",
+    "lines": 10343650
+  },
+  {
+    "name": "thevault_c_comment_code.jsonl",
+    "lines": 6778329
+  },
+  {
+    "name": "thevault_c_docstring_code.jsonl",
+    "lines": 1925238
+  },
+  {
+    "name": "thevault_cpp_docstring_code.jsonl",
+    "lines": 1893104
+  },
+  {
+    "name": "thevault_c_sharp_docstring_code.jsonl",
+    "lines": 3959754
+  },
+  {
+    "name": "thevault_go_comment_code.jsonl",
+    "lines": 4390342
+  },
+  {
+    "name": "thevault_go_docstring_code.jsonl",
+    "lines": 5600826
+  },
+  {
+    "name": "thevault_java_comment_code.jsonl",
+    "lines": 17062277
+  },
+  {
+    "name": "thevault_java_docstring_code.jsonl",
+    "lines": 7844415
+  },
+  {
+    "name": "thevault_javascript_comment_code.jsonl",
+    "lines": 1438110
+  },
+  {
+    "name": "thevault_javascript_docstring_code.jsonl",
+    "lines": 2499494
+  },
+  {
+    "name": "thevault_php_comment_code.jsonl",
+    "lines": 5873744
+  },
+  {
+    "name": "thevault_php_docstring_code.jsonl",
+    "lines": 5411232
+  },
+  {
+    "name": "thevault_python_comment_code.jsonl",
+    "lines": 14013238
+  },
+  {
+    "name": "thevault_python_docstring_code.jsonl",
+    "lines": 9800153
+  },
+  {
+    "name": "thevault_ruby_comment_code.jsonl",
+    "lines": 767563
+  },
+  {
+    "name": "thevault_ruby_docstring_code.jsonl",
+    "lines": 501586
+  },
+  {
+    "name": "thevault_rust_comment_code.jsonl",
+    "lines": 2063784
+  },
+  {
+    "name": "thevault_rust_docstring_code.jsonl",
+    "lines": 1029481
+  }
+]

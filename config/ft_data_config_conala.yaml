@@ -1,0 +1,3 @@
+- name: CoNaLa
+  data_file: /data01/lizehan/proqa/raw_data/conala/conala-curated-snippets.jsonl 
+  train_group_size: 8

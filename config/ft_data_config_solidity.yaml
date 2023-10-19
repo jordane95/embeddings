@@ -1,0 +1,3 @@
+- name: Solidity
+  data_file: /data01/lizehan/proqa/code/CDCS/dataset/train_valid/Solidity/train.txt
+  train_group_size: 8

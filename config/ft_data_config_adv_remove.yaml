@@ -1,0 +1,5 @@
+
+- name: AdvRemove
+  data_file: /data01/lizehan/proqa/code/CodeXGLUE/Text-Code/NL-code-search-Adv/dataset/train.jsonl
+  train_group_size: 8
+
