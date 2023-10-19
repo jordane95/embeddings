@@ -1,33 +1,27 @@
 - name: MSMARCO
-  corpus_file: # must
-  corpus_id_file: # must
-  train_query_file: # must
-  train_query_id_file: # must
-  train_qrels: # must
-  neg_file: # Optinal
-  teacher_score_files: # Optinal
+  train_file: data/msmarco/kd_train.jsonl
+  corpus_file: data/msmarco/passages.jsonl
   sample_neg_from_topk: 200
   train_group_size: 8
 
-
 - name: NQ
   train_files:
-    - biencoder-nq-train.json
-    - hn.json
+    - data/nq/biencoder-nq-train.json
+    - data/nq/hn.json
   train_group_size: 8
 
 
 - name: NLI
-  data_file: data/nli_for_simcse.csv
+  data_file: data/nli/nli_for_simcse.csv
   train_group_size: 8
 
 
 - name: MEDI
-  data_file: /data01/lizehan/embeddings/instructor-embedding/cache/medi-data/medi-data.json
+  data_file: data/medi/medi-data.json
   train_group_size: 8 # useless for now
 
 
 - name: BERRI
-  data_file:
-  instruction_file:
+  data_file: data/berri/train_mixed.jsonl
+  instruction_file: data/berri/berri_instructions.tsv
   train_group_size: 8

@@ -124,9 +124,38 @@ class RetrievalDataset(torch.utils.data.Dataset):
         return {"query": query, "pos": pos_doc, "negs": neg_docs, "teacher_score": teacher_scores}
 
 
+class MSMARCODataset(torch.utils.data.Dataset):
+    def __init__(self, data_config: Dict[str, Any]):
+        self.train_dataset = load_dataset('json', data_files=data_config['train_file'], split='train', cache_dir='cache')
+        self.corpus = load_dataset('json', data_files=data_config['corpus_file'], split='train', cache_dir='cache')
+        self.top_k = data_config['sample_neg_from_topk']
+        self.train_group_size = data_config['train_group_size']
+
+    def __len__(self):
+        return len(self.train_dataset)
+    
+    def __getitem__(self, idx):
+        item = self.train_dataset[idx]
+        query = item['query'] # str
+        pos_id = int(random.choice(item['positives']['doc_id']))
+        pos = self.corpus[pos_id]['title'] + " " + self.corpus[pos_id]['contents'] # str
+        query_negs = list(map(int, item['negatives']['doc_id']))
+        if len(query_negs) < self.train_group_size - 1:
+            neg_ids = [random.randrange(len(self.corpus)) for _ in range(self.train_group_size - 1 - len(query_negs))]
+            neg_ids.extend(query_negs)
+        else:
+            neg_ids = random.sample(query_negs, k=self.train_group_size - 1)
+        negs = [self.corpus[neg_id]['title'] + " " + self.corpus[neg_id]['contents'] for neg_id in neg_ids] # List[str]
+        return {"query": query, "pos": pos, "negs": negs}
+
+
 class NQDataset(torch.utils.data.Dataset):
     def __init__(self, data_config: Dict[str, Any]):
-        self.dataset = load_dataset('json', data_files=data_config["train_files"], split='train', cache_dir='cache')
+        # self.dataset = load_dataset('json', data_files=data_config["train_files"], split='train', cache_dir='cache')
+        # self.dataset = []
+        # for data_file in data_config["train_files"]:
+        #     self.dataset.extend(json.load(open(data_file)))
+        self.dataset = sum([json.load(open(data_file)) for data_file in data_config["train_files"]], [])
         self.train_group_size = data_config['train_group_size']
     
     def __len__(self):

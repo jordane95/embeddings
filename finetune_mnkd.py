@@ -119,12 +119,12 @@ def main():
         cache_dir=model_args.cache_dir,
     )
 
-    if training_args.local_rank > 0:
-        print("Waiting for main process to perform the mapping")
-        torch.distributed.barrier()
-    if training_args.local_rank == 0:
-        print("Loading results from main process")
-        torch.distributed.barrier()
+    # if training_args.local_rank > 0:
+    #     print("Waiting for main process to perform the mapping")
+    #     torch.distributed.barrier()
+    # if training_args.local_rank == 0:
+    #     print("Loading results from main process")
+    #     torch.distributed.barrier()
 
     world_size = dist.get_world_size() if dist.is_initialized() else 1
     global_batch_size = training_args.per_device_train_batch_size * world_size

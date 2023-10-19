@@ -20,90 +20,11 @@ logger = logging.getLogger(__name__)
 class EncoderPooler(nn.Module):
     def __init__(self, **kwargs):
         super(EncoderPooler, self).__init__()
+        self.pooling = 'mean'
         self._config = {}
 
     def forward(self, token_embeddings):
         raise NotImplementedError('EncoderPooler is an abstract class')
-
-    def load(self, model_dir: str):
-        pooler_path = os.path.join(model_dir, 'pooler.pt')
-        if pooler_path is not None:
-            if os.path.exists(pooler_path):
-                logger.info(f'Loading Pooler from {pooler_path}')
-                state_dict = torch.load(pooler_path, map_location='cpu')
-                self.load_state_dict(state_dict)
-                return
-        logger.info("Training Pooler from scratch")
-        return
-
-    def save_pooler(self, save_path):
-        torch.save(self.state_dict(), os.path.join(save_path, 'pooler.pt'))
-        with open(os.path.join(save_path, 'pooler_config.json'), 'w') as f:
-            json.dump(self._config, f)
-
-
-
-class DensePooler(EncoderPooler):
-    def __init__(self, input_dim: int = 768, output_dim: int = 768, normalize=False):
-        super(DensePooler, self).__init__()
-        self.normalize = normalize
-        self.pooler = nn.Linear(input_dim, output_dim)
-        self._config = {'input_dim': input_dim, 'output_dim': output_dim, 'normalize': normalize}
-
-    def forward(self, token_embeddings: Tensor = None, **kwargs):
-        rep = self.pooler(token_embeddings)
-        if self.normalize:
-            rep = nn.functional.normalize(rep, dim=-1)
-        return rep
-
-
-
-@dataclass
-class EncoderOutput(ModelOutput):
-    q_reps: Optional[Tensor] = None
-    d_reps: Optional[Tensor] = None
-    loss: Optional[Tensor] = None
-    scores: Optional[Tensor] = None
-
-
-class AutoModelForSentenceEmbedding(nn.Module):
-    def __init__(
-        self,
-        model_name_or_path: str,
-        pooling: str = 'mean',
-        normalize: bool = True,
-        add_pooler: bool = False,
-        embedding_dim: Optional[int] = None,
-        bitfit: bool = False,
-        **kwargs,
-    ):
-        super(AutoModelForSentenceEmbedding, self).__init__()
-
-        self.lm = AutoModel.from_pretrained(model_name_or_path, **kwargs)
-        self.pooling = pooling
-        self.normalize = normalize
-        self.add_pooler = add_pooler
-        self.pooler = nn.Linear(self.lm.config.hidden_size, embedding_dim or self.lm.config.hidden_size) if add_pooler else nn.Identity()
-
-        if bitfit:
-            for name, param in self.lm.named_parameters():
-                if 'bias' not in name:
-                    param.requires_grad = False
-
-        self.cross_entropy = nn.CrossEntropyLoss(reduction='mean')
-
-    def encode(self, texts):
-        if texts is None:
-            return None
-        # import pdb; pdb.set_trace()
-        pooling_mask = texts.pop('pooling_mask') if "pooling_mask" in texts else texts['attention_mask']
-        outputs = self.lm(**texts)
-        last_hidden_state = outputs.last_hidden_state
-        embeddings = self.pool_sentence_embedding(last_hidden_state, pooling_mask)
-        embeddings = self.pooler(embeddings)
-        if self.normalize:
-            embeddings = F.normalize(embeddings, p=2, dim=1)
-        return embeddings.contiguous()
     
     def pool_sentence_embedding(self, last_hidden_state: Tensor, attention_mask: Tensor) -> Tensor:
         if self.pooling == 'mean':
@@ -157,6 +78,97 @@ class AutoModelForSentenceEmbedding(nn.Module):
         else:
             raise NotImplementedError(f"Currently do not support pooling method: {self.pooling}")
 
+
+
+    def load(self, model_dir: str):
+        pooler_path = os.path.join(model_dir, 'pooler.pt')
+        if pooler_path is not None:
+            if os.path.exists(pooler_path):
+                logger.info(f'Loading Pooler from {pooler_path}')
+                state_dict = torch.load(pooler_path, map_location='cpu')
+                self.load_state_dict(state_dict)
+                return
+        logger.info("Training Pooler from scratch")
+        return
+
+    def save_pooler(self, save_path):
+        torch.save(self.state_dict(), os.path.join(save_path, 'pooler.pt'))
+        with open(os.path.join(save_path, 'pooler_config.json'), 'w') as f:
+            json.dump(self._config, f)
+
+
+class DensePooler(EncoderPooler):
+    def __init__(self, input_dim: int = 768, output_dim: int = 768, normalize=False):
+        super(DensePooler, self).__init__()
+        self.normalize = normalize
+        self.pooler = nn.Linear(input_dim, output_dim)
+        self._config = {'input_dim': input_dim, 'output_dim': output_dim, 'normalize': normalize}
+
+    def forward(self, token_embeddings: Tensor = None, **kwargs):
+        sentence_embeddings = self.pool_sentence_embedding(token_embeddings)
+        rep = self.pooler(sentence_embeddings)
+        if self.normalize:
+            rep = nn.functional.normalize(rep, dim=-1)
+        return rep
+
+
+class ModularPooler(EncoderPooler):
+    def __init__(self, input_dim: int = 768, output_dim: int = 768, normalize=False, n_experts: int = 32, top_k: int = 8):
+        
+
+        self.router = nn.Linear(input_dim, n_experts)
+        self.experts = [
+            nn.Linear(input_dim, output_dim)
+            for _ in range(n_experts)
+        ]
+        
+
+    def forward(self, token_embeddings: Tensor = None, **kwargs):
+        expert_probs = self.router(token_embeddings) # (batch_size, seq_len, n_experts)
+        token_experts = self.
+
+        pass
+    
+
+
+@dataclass
+class EncoderOutput(ModelOutput):
+    q_reps: Optional[Tensor] = None
+    d_reps: Optional[Tensor] = None
+    loss: Optional[Tensor] = None
+    scores: Optional[Tensor] = None
+
+
+class AutoModelForSentenceEmbedding(nn.Module):
+    def __init__(
+        self,
+        model_name_or_path: str,
+        pooling: str = 'mean',
+        normalize: bool = True,
+        add_pooler: bool = False,
+        embedding_dim: Optional[int] = None,
+        **kwargs,
+    ):
+        super(AutoModelForSentenceEmbedding, self).__init__()
+
+        self.lm = AutoModel.from_pretrained(model_name_or_path, **kwargs)
+        self.pooling = pooling
+        self.normalize = normalize
+        
+        self.pooler = DensePooler(args)
+
+        self.cross_entropy = nn.CrossEntropyLoss(reduction='mean')
+
+    def encode(self, texts):
+        if texts is None:
+            return None
+        # import pdb; pdb.set_trace()
+        pooling_mask = texts.pop('pooling_mask') if "pooling_mask" in texts else texts['attention_mask']
+        outputs = self.lm(**texts)
+        token_embeddings = outputs.last_hidden_state
+        embeddings = self.pooler(token_embeddings)
+        return embeddings.contiguous()
+    
     def forward(
         self,
         query: Dict[str, Tensor] = None,

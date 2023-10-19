@@ -11,7 +11,7 @@ export CUDA_VISIBLE_DEVICES=2,3
 # bert-base
 # 512bs x 512msl => 33G x 31h
 
-python train.py \
+deepspeed train.py --deepspeed config/ds_config.json \
     --model_name_or_path bert-base-uncased \
     --output_dir debug \
     --train_dir /data01/lizehan/proqa/pls \
@@ -34,6 +34,4 @@ python train.py \
     --gradient_checkpointing True \
     --grad_cache False \
     --seed 42 \
-    --dataloader_num_workers 1 \
-    --full_contrastive_loss False \
-    --buffer_size 100000
+    --dataloader_num_workers 1
