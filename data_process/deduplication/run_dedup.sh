@@ -1,0 +1,1 @@
+python minhash_deduplication.py --set1 ../pretrain/stackoverflow_python_question_answer.jsonl --set2 ../eval/staqc/staqc_query_code.jsonl
