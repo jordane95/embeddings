@@ -28,11 +28,11 @@ def get_args():
     parser.add_argument('--n-experts', default=8, type=int, help='number of experts')
     parser.add_argument('--residual-pooler', action='store_true', help='add residual conntection to pooler')
 
+    args = parser.parse_args()
+    
     logger.info('Args: {}'.format(json.dumps(args.__dict__, ensure_ascii=False, indent=4)))
     assert args.pooling in ['mean', 'last', 'weightedmean'], 'pool_type should be cls / avg / last'
     os.makedirs(args.output_dir, exist_ok=True)
-
-    args = parser.parse_args()
     return args
 
 
