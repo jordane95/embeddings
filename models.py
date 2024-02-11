@@ -78,6 +78,10 @@ class AutoModelForSentenceEmbedding(nn.Module):
         # import pdb; pdb.set_trace()
         pooling_mask = texts.pop('pooling_mask') if "pooling_mask" in texts else texts['attention_mask']
         outputs = self.lm(**texts)
+        embeddings = self.compress(outputs, pooling_mask)
+        return embeddings
+    
+    def compress(self, outputs, pooling_mask):
         last_hidden_state = outputs.last_hidden_state
         # original embedding
         embeddings = self.pool_sentence_embedding(last_hidden_state, pooling_mask)

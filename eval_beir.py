@@ -35,15 +35,17 @@ def get_args():
     return args
 
 
-class AutoModelForSentenceEmbeddingDataParallel(AutoModelForSentenceEmbedding):
-    def forward(self, batch_dict):
-        return self.encode(batch_dict)
+class AutoModelForSentenceEmbeddingDP(AutoModelForSentenceEmbedding):
+    def forward(self, input_ids, attention_mask):
+        outputs = self.lm(input_ids, attention_mask)
+        embeddings = self.compress(outputs, attention_mask)
+        return embeddings
 
 
 class RetrievalModel(DRESModel):
     # Refer to the code of DRESModel for the methods to overwrite
     def __init__(self, args):
-        self.encoder = AutoModelForSentenceEmbeddingDataParallel(
+        self.encoder = AutoModelForSentenceEmbeddingDP(
             model_name_or_path=args.model_name_or_path,
             pooling=args.pooling,
             normalize=args.normalize,

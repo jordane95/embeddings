@@ -1,6 +1,5 @@
 import os
 import torch
-from torch import nn
 import torch.nn.functional as F
 import tqdm
 import json
@@ -37,10 +36,17 @@ def get_args():
     return args
 
 
+class AutoModelForSentenceEmbeddingDP(AutoModelForSentenceEmbedding):
+    def forward(self, input_ids, attention_mask):
+        outputs = self.lm(input_ids, attention_mask)
+        embeddings = self.compress(outputs, attention_mask)
+        return embeddings
+
+
 class DenseEncoder(torch.nn.Module):
     def __init__(self, args):
         super().__init__()
-        self.encoder = AutoModelForSentenceEmbedding(
+        self.encoder = AutoModelForSentenceEmbeddingDP(
             model_name_or_path=args.model_name_or_path,
             pooling=args.pooling,
             normalize=args.normalize,
@@ -89,12 +95,7 @@ class DenseEncoder(torch.nn.Module):
             batch_dict = move_to_cuda(batch_dict)
 
             with torch.cuda.amp.autocast():
-                batch_dict_scattered = nn.parallel.scatter(batch_dict, devices_ids=self.encoder.device_ids)
-                encoded_scattered = nn.parallel.parallel_apply(
-                    [self.encoder.module.encode for _ in self.encoder.device_ids],
-                    batch_dict_scattered
-                )
-                embeds = nn.parallel.gather(encoded_scattered, target_devices=self.encoder.device_ids[0])
+                embeds = self.encoder(batch_dict)
                 encoded_embeds.append(embeds.cpu().numpy())
 
         return np.concatenate(encoded_embeds, axis=0)
