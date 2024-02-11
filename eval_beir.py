@@ -97,6 +97,7 @@ class RetrievalModel(DRESModel):
 
 
 if __name__ == "__main__":
+    args = get_args()
     assert AbsTaskRetrieval.is_dres_compatible(RetrievalModel)
     model = RetrievalModel(args)
 
