@@ -182,8 +182,8 @@ class AutoModelForSentenceEmbedding(nn.Module):
             loss=loss,
         )
     
-    def gradient_checkpointing_enable(self):
-        self.lm.gradient_checkpointing_enable()
+    def gradient_checkpointing_enable(self, *args, **kwargs):
+        self.lm.gradient_checkpointing_enable(*args, **kwargs)
 
     def save_pretrained(self, output_path):
         self.lm.save_pretrained(output_path)
