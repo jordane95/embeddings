@@ -22,6 +22,7 @@ def get_args():
 
     parser.add_argument('--model-name-or-path', default='tmp-outputs/', type=str, metavar='N', help='which model to use')
     parser.add_argument('--pooling', default='mean', help='pool type')
+    parser.add_argument('--normalize', action='store_true', help='normalize embeddings?')
     parser.add_argument('--add-pooler', default='dense', type=str, help='projection head type')
     parser.add_argument('--n-experts', default=8, type=int, help='number of experts')
     parser.add_argument('--residual-pooler', action='store_true', help='add residual conntection to pooler')

@@ -8,4 +8,5 @@ python eval_beir.py \
     --output-dir ${output_dir} \
     --model-name-or-path ${model_path} \
     --pooling mean \
+    --normalize \
     --add-pooler dense 
