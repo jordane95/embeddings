@@ -1,24 +1,24 @@
-- name: MSMARCO
-  train_file: data/msmarco/kd_train.jsonl
-  corpus_file: data/msmarco/passages.jsonl
-  sample_neg_from_topk: 200
-  train_group_size: 8
+# - name: MSMARCO
+#   train_file: data/msmarco/kd_train.jsonl
+#   corpus_file: data/msmarco/passages.jsonl
+#   sample_neg_from_topk: 200
+#   train_group_size: 8
 
-- name: NQ
-  train_files:
-    - data/nq/biencoder-nq-train.json
-    - data/nq/hn.json
-  train_group_size: 8
-
-
-- name: NLI
-  data_file: data/nli/nli_for_simcse.csv
-  train_group_size: 8
+# - name: NQ
+#   train_files:
+#     - data/nq/biencoder-nq-train.json
+#     - data/nq/hn.json
+#   train_group_size: 8
 
 
-- name: MEDI
-  data_file: data/medi/medi-data.json
-  train_group_size: 8 # useless for now
+# - name: NLI
+#   data_file: data/nli/nli_for_simcse.csv
+#   train_group_size: 8
+
+
+# - name: MEDI
+#   data_file: data/medi/medi-data.json
+#   train_group_size: 8 # useless for now
 
 
 - name: BERRI

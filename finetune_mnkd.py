@@ -116,6 +116,9 @@ def main():
         normalize=model_args.normalize,
         add_pooler=model_args.add_pooler,
         embedding_dim=model_args.embedding_dim,
+        peft=model_args.peft,
+        n_experts=model_args.n_experts,
+        residual_pooler=model_args.residual_pooler,
         cache_dir=model_args.cache_dir,
     )
 

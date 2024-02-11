@@ -2,6 +2,7 @@ import logging
 import os
 import sys
 import json
+import yaml
 
 import torch
 import torch.distributed as dist
@@ -13,6 +14,11 @@ from transformers import (
     set_seed,
 )
 from transformers.trainer_utils import is_main_process
+from transformers import (
+    TrainerCallback,
+    TrainerState,
+    TrainerControl
+)
 
 from arguments import (
     ModelArguments,
@@ -20,17 +26,29 @@ from arguments import (
     EmbeddingTrainingArguments as TrainingArguments,
 )
 
-from data import (
-    InfiniteMultipleIterableDataset,
-    QDCollator,
+from data_mte import StreamDatasetMNKD
+
+from data_mnkd import (
+    MultiDatasetMNKD,
+    TripleCollatorMNKD,
 )
-from models import AutoModelForSentenceEmbedding
+from models import AutoModelForEmbeddingMNKD as AutoModelForSentenceEmbedding
+
 from trainer import (
     EmbeddingTrainer as Trainer,
     GCTrainer,
 )
 
 logger = logging.getLogger(__name__)
+
+
+class ShuffleCallback(TrainerCallback):
+    def on_epoch_begin(self, args: TrainingArguments, state: TrainerState, control: TrainerControl, **kwargs):
+        """
+        Event called at the beginning of an epoch.
+        """
+        train_dataloader = kwargs['train_dataloader']
+        train_dataloader.dataset.shuffle_batch()
 
 
 def main():
@@ -93,9 +111,7 @@ def main():
         model_args.tokenizer_name if model_args.tokenizer_name else model_args.model_name_or_path,
         cache_dir=model_args.cache_dir
     )
-    tokenizer.padding_side = 'right' # bloom
-    if "gpt" in model_args.model_name_or_path: # gpt-neo
-        tokenizer.pad_token = tokenizer.eos_token
+    tokenizer.padding_side = 'right'
     model = AutoModelForSentenceEmbedding(
         model_args.model_name_or_path,
         pooling=model_args.pooling,
@@ -108,29 +124,26 @@ def main():
         cache_dir=model_args.cache_dir,
     )
 
-    if training_args.local_rank > 0:
-        print("Waiting for main process to perform the mapping")
-        torch.distributed.barrier()
-    if training_args.local_rank == 0:
-        print("Loading results from main process")
-        torch.distributed.barrier()
-
-    data_config = json.load(open(data_args.data_config))
+    # if training_args.local_rank > 0:
+    #     print("Waiting for main process to perform the mapping")
+    #     torch.distributed.barrier()
+    # if training_args.local_rank == 0:
+    #     print("Loading results from main process")
+    #     torch.distributed.barrier()
 
     world_size = dist.get_world_size() if dist.is_initialized() else 1
     global_batch_size = training_args.per_device_train_batch_size * world_size
-    train_dataset = InfiniteMultipleIterableDataset(
-        train_dir=data_args.train_dir,
-        data_config=data_config,
+
+    ft_data_configs = yaml.safe_load(open(data_args.finetune_data_config)) # List[Dict]
+
+    train_dataset = StreamDatasetMNKD(
+        data_configs=ft_data_configs,
         batch_size=global_batch_size,
-        query_field=data_args.query_column,
-        doc_field=data_args.doc_column,
-        coeff=data_args.mix_coefficient,
-        buffer_size=data_args.buffer_size,
-        seed=training_args.seed,
     )
 
-    data_collator = QDCollator(
+    # import pdb; pdb.set_trace();
+
+    data_collator = TripleCollatorMNKD(
         tokenizer,
         max_q_len=data_args.q_max_len,
         max_d_len=data_args.d_max_len,

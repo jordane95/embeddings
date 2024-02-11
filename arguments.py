@@ -20,14 +20,17 @@ class ModelArguments:
     )
 
     # out projection
-    add_pooler: bool = field(default=False)
+    add_pooler: str = field(default=None, metadata={"help": "If specified, denotes the type of parametric pooler."})
     embedding_dim: int = field(default=768)
     normalize: bool = field(default=False)
     pooling: str = field(default='mean')
 
     # peft
-    bitfit: bool = field(default=False)
+    peft: bool = field(default=False)
 
+    n_experts: int = field(default=8, metadata={"help": "Number of experts, only useful when add pooler is 'moe'"})
+    residual_pooler: bool = field(default=False, metadata={"help": "Add a residual connection of the original embedding?"})
+    
     # for Jax training
     dtype: Optional[str] = field(
         default="float32",
