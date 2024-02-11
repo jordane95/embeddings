@@ -89,7 +89,7 @@ class DenseEncoder(torch.nn.Module):
             batch_dict = move_to_cuda(batch_dict)
 
             with torch.cuda.amp.autocast():
-                batch_dict_scattered = nn.parallel.scatter(batch_dict, devices=self.encoder.device_ids)
+                batch_dict_scattered = nn.parallel.scatter(batch_dict, devices_ids=self.encoder.device_ids)
                 encoded_scattered = nn.parallel.parallel_apply(
                     [self.encoder.module.encode for _ in self.encoder.device_ids],
                     batch_dict_scattered
