@@ -89,7 +89,7 @@ class DenseEncoder(torch.nn.Module):
             batch_dict = move_to_cuda(batch_dict)
 
             with torch.cuda.amp.autocast():
-                embeds = self.encoder.encode(batch_dict)
+                embeds = self.encoder.module.encode(batch_dict)
                 encoded_embeds.append(embeds.cpu().numpy())
 
         return np.concatenate(encoded_embeds, axis=0)
