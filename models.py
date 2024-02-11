@@ -200,6 +200,7 @@ class AutoModelForSentenceEmbedding(nn.Module):
                 self.pooler.load(output_path)
             except FileNotFoundError:
                 logger.info(f"Cannot find pooler.pt at {output_path}")
+        return self
 
 
 
