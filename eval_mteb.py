@@ -15,7 +15,6 @@ from models import AutoModelForSentenceEmbedding
 from utils import logger, move_to_cuda
 
 
-
 def get_args():
     parser = argparse.ArgumentParser(description='evaluation for MTEB benchmark except its Retrieval category')
     parser.add_argument('--task-types', nargs='+', default=[], help='task types to evaluate')
@@ -37,10 +36,15 @@ def get_args():
     return args
 
 
+class AutoModelForSentenceEmbeddingDataParallel(AutoModelForSentenceEmbedding):
+    def forward(self, batch_dict):
+        return self.encode(batch_dict)
+
+
 class DenseEncoder(torch.nn.Module):
     def __init__(self, args):
         super().__init__()
-        self.encoder = AutoModelForSentenceEmbedding(
+        self.encoder = AutoModelForSentenceEmbeddingDataParallel(
             model_name_or_path=args.model_name_or_path,
             pooling=args.pooling,
             normalize=args.normalize,
@@ -89,7 +93,7 @@ class DenseEncoder(torch.nn.Module):
             batch_dict = move_to_cuda(batch_dict)
 
             with torch.cuda.amp.autocast():
-                embeds = self.encoder.module.encode(batch_dict)
+                embeds = self.encoder(batch_dict)
                 encoded_embeds.append(embeds.cpu().numpy())
 
         return np.concatenate(encoded_embeds, axis=0)

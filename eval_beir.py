@@ -34,10 +34,16 @@ def get_args():
     os.makedirs(args.output_dir, exist_ok=True)
     return args
 
+
+class AutoModelForSentenceEmbeddingDataParallel(AutoModelForSentenceEmbedding):
+    def forward(self, batch_dict):
+        return self.encode(batch_dict)
+
+
 class RetrievalModel(DRESModel):
     # Refer to the code of DRESModel for the methods to overwrite
     def __init__(self, args):
-        self.encoder = AutoModelForSentenceEmbedding(
+        self.encoder = AutoModelForSentenceEmbeddingDataParallel(
             model_name_or_path=args.model_name_or_path,
             pooling=args.pooling,
             normalize=args.normalize,
@@ -82,7 +88,7 @@ class RetrievalModel(DRESModel):
             batch_dict = move_to_cuda(batch_dict)
 
             with torch.cuda.amp.autocast():
-                embeds = self.encoder.module.encode(batch_dict)
+                embeds = self.encoder(batch_dict)
                 encoded_embeds.append(embeds.cpu().numpy())
 
         return np.concatenate(encoded_embeds, axis=0)
