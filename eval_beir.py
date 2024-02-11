@@ -24,7 +24,7 @@ def get_args():
     parser.add_argument('--pooling', default='mean', help='pool type')
     parser.add_argument('--add-pooler', default='dense', type=str, help='projection head type')
     parser.add_argument('--n-experts', default=8, type=int, help='number of experts')
-    parser.add_argument('--residual-pooler', type='store_true', help='add residual conntection to pooler')
+    parser.add_argument('--residual-pooler', action='store_true', help='add residual conntection to pooler')
 
     logger.info('Args: {}'.format(json.dumps(args.__dict__, ensure_ascii=False, indent=4)))
     assert args.pooling in ['mean', 'last', 'weightedmean'], 'pool_type should be cls / avg / last'
