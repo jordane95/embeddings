@@ -103,7 +103,7 @@ class DenseEncoder(torch.nn.Module):
 
 if __name__ == "__main__":
     args = get_args()
-    model = DenseEncoder(args)
+    # model = DenseEncoder(args)
     args.task_types = [t for t in args.task_types if t.strip()]
     evaluation = MTEB(
         task_types=args.task_types or None,
@@ -119,12 +119,12 @@ if __name__ == "__main__":
 
         # disable l2 normalize for classification tasks, as it achieves slightly better results
         if task_type == 'Classification':
-            logger.info('Set l2_normalize to False for classification task')
-            model.encoder.normalize = False
+            args.normalize = False
         else:
-            model.encoder.normalize = True
-            logger.info('Set l2_normalize to {}'.format(model.encoder.normalize))
+            args.normalize = True
+        logger.info('Set l2_normalize to {}'.format(args.normalize))
 
+        model = DenseEncoder(args)
         sub_eval = MTEB(tasks=[task_name], task_langs=['en'] if not args.multilingual else None)
         logger.info('Running evaluation for task: {}, type: {}'.format(task_name, task_type))
         eval_splits = ["test"] if "test" in task_cls.description["eval_splits"] else task_cls.description["eval_splits"]
