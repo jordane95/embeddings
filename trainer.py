@@ -126,7 +126,7 @@ class EmbeddingTrainer(Trainer):
         )
 
         if self.model.training:
-            self.load_balancing_loss.updates(outputs.load_balancing_loss)
+            self.load_balancing_loss.update(outputs.load_balancing_loss)
         
         return outputs.loss
 
