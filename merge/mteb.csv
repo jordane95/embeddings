@@ -1,0 +1,2 @@
+,Model,Classification Average (12 datasets),Clustering Average (11 datasets),Pair Classification Average (3 datasets),Reranking Average (4 datasets),Retrieval Average (15 datasets),STS Average (10 datasets),Summarization Average (1 dataset),Average (56 datasets)
+0,gte_meta.md,73.0,46.2,84.6,58.6,51.1,82.3,31.2,62.4
