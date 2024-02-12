@@ -15,6 +15,8 @@ from loss import SimpleContrastiveLoss, DistributedContrastiveLoss
 import logging
 logger = logging.getLogger(__name__)
 
+from utils import AverageMeter
+
 try:
     from grad_cache import GradCache
     _grad_cache_available = True
@@ -35,6 +37,40 @@ class EmbeddingTrainer(Trainer):
         self._warmup_steps = self.args.get_warmup_steps(self.args.max_steps)
         logger.info(f"Warmup steps: {self._warmup_steps}")
 
+        self.load_balancing_loss = AverageMeter('load_balancing_loss', round_digits=3)
+        self.last_epoch = 0
+
+    def _reset_meters_if_needed(self):
+        if int(self.state.epoch) != self.last_epoch:
+            self.last_epoch = int(self.state.epoch)
+            self.load_balancing_loss.reset()
+    
+    def log(self, logs: Dict[str, float]) -> None:
+        """
+        Log `logs` on the various objects watching training.
+
+        Subclass and override this method to inject custom behavior.
+
+        Args:
+            logs (`Dict[str, float]`):
+                The values to log.
+        """
+        # compared to hf implementation, add a step field, but why?
+        logs["step"] = self.state.global_step
+
+        if self.state.epoch is not None:
+            logs["epoch"] = round(self.state.epoch, 2)
+
+        # Add extra loss to logs
+        logs["load_balancing_loss"] = self.load_balancing_loss.value()
+        
+        self._reset_meters_if_needed()
+
+        output = {**logs, **{"step": self.state.global_step}}
+        self.state.log_history.append(output)
+        self.control = self.callback_handler.on_log(self.args, self.state, self.control, logs)
+
+    
     def _get_train_sampler(self) -> Optional[torch.utils.data.Sampler]:
         if self.train_dataset is None or not has_length(self.train_dataset):
             return None
@@ -80,13 +116,19 @@ class EmbeddingTrainer(Trainer):
         disable_x_device = self.args.contrastive_warmup and (self.state.global_step <= self._warmup_steps)
         negatives_x_device = self.args.negatives_x_device and not disable_x_device
         temperature = max(self.args.temperature, 1 - self.state.global_step / self._warmup_steps) if self.args.t_warmup else self.args.temperature
-        return model(
+
+        outputs = model(
             **inputs,
             temperature=temperature,
             negatives_x_device=negatives_x_device,
             loss_scale=self._dist_loss_scale_factor if negatives_x_device else 1.0,
             full_contrastive_loss=self.args.full_contrastive_loss,
-        ).loss
+        )
+
+        if self.model.training:
+            self.load_balancing_loss.updates(outputs.load_balancing_loss)
+        
+        return outputs.loss
 
     def training_step(self, *args):
         disable_x_device = self.args.contrastive_warmup and (self.state.global_step <= self._warmup_steps)

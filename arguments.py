@@ -30,6 +30,7 @@ class ModelArguments:
 
     n_experts: int = field(default=8, metadata={"help": "Number of experts, only useful when add pooler is 'moe'"})
     residual_pooler: bool = field(default=False, metadata={"help": "Add a residual connection of the original embedding?"})
+    load_balancing_loss_ratio: float = field(default=0, metadata={"help": "Add load balancing loss?"})
     
     # for Jax training
     dtype: Optional[str] = field(

@@ -30,6 +30,7 @@ class EncoderOutput(ModelOutput):
     d_reps: Optional[Tensor] = None
     loss: Optional[Tensor] = None
     scores: Optional[Tensor] = None
+    load_balancing_loss: Optional[Tensor] = None
 
 
 class AutoModelForSentenceEmbedding(nn.Module):
@@ -265,6 +266,8 @@ class AutoModelForEmbeddingMNKD(AutoModelForSentenceEmbedding):
 
         kl_loss = 0.0
         self.contrastive_loss_weight = 0.2
+        self.load_balancing_loss_ratio = 0.01
+
         if teacher_score is not None:
             batch_size, embedding_dim = q_embeddings.shape
             student_q = q_embeddings.view(batch_size, 1, embedding_dim)  # B 1 D
@@ -291,6 +294,11 @@ class AutoModelForEmbeddingMNKD(AutoModelForSentenceEmbedding):
 
         if teacher_score is not None:
             loss = kl_loss + self.contrastive_loss_weight * loss
+        
+        load_balancing_loss = None
+        if self.add_pooler == 'moe':
+            load_balancing_loss = self.pooler.load_balancing_loss
+            loss += self.load_balancing_loss_ratio * load_balancing_loss
 
         # import pdb; pdb.set_trace()
         return EncoderOutput(
@@ -298,4 +306,5 @@ class AutoModelForEmbeddingMNKD(AutoModelForSentenceEmbedding):
             d_reps=d_embeddings,
             scores=scores,
             loss=loss,
+            load_balancing_loss=load_balancing_loss,
         )
