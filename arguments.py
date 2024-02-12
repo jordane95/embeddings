@@ -30,7 +30,6 @@ class ModelArguments:
 
     n_experts: int = field(default=8, metadata={"help": "Number of experts, only useful when add pooler is 'moe'"})
     residual_pooler: bool = field(default=False, metadata={"help": "Add a residual connection of the original embedding?"})
-    load_balancing_loss_ratio: float = field(default=0, metadata={"help": "Add load balancing loss?"})
     
     # for Jax training
     dtype: Optional[str] = field(
@@ -112,3 +111,7 @@ class EmbeddingTrainingArguments(TrainingArguments):
     full_contrastive_loss: bool = field(default=True)
 
     loss_scale: float = field(default=-1., metadata={"help": "loss scale, -1 will use world_size"})
+
+    contrastive_loss_weight: float = field(default=0.2, metadata={"help": "contrastive loss weight during knowledge distillation"})
+
+    load_balancing_loss_ratio: float = field(default=0, metadata={"help": "Add load balancing loss?"})

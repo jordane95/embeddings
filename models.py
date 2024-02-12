@@ -259,14 +259,16 @@ class AutoModelForEmbeddingMNKD(AutoModelForSentenceEmbedding):
         negatives_x_device: bool = False,
         loss_scale: float = 1.0,
         full_contrastive_loss: bool = True,
+        contrastive_loss_weight: float = 0.2,
+        load_balancing_loss_ratio: float = 0.0,
     ):
         q_embeddings = self.encode(query) # (batch_size, embedding_dim)
         p_embeddings = self.encode(pos) # (batch_size, embedding_dim)
         n_embeddings = self.encode(negs) # (batch_size * num_neg, embedding_dim)
 
         kl_loss = 0.0
-        self.contrastive_loss_weight = 0.2
-        self.load_balancing_loss_ratio = 0.01
+        self.contrastive_loss_weight = contrastive_loss_weight
+        self.load_balancing_loss_ratio = load_balancing_loss_ratio
 
         if teacher_score is not None:
             batch_size, embedding_dim = q_embeddings.shape
@@ -296,7 +298,7 @@ class AutoModelForEmbeddingMNKD(AutoModelForSentenceEmbedding):
             loss = kl_loss + self.contrastive_loss_weight * loss
         
         load_balancing_loss = None
-        if self.add_pooler == 'moe':
+        if self.add_pooler == 'moe' and self.load_balancing_loss_ratio > 0:
             load_balancing_loss = self.pooler.load_balancing_loss
             loss += self.load_balancing_loss_ratio * load_balancing_loss
 
