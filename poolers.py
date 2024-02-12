@@ -69,16 +69,15 @@ class MoEPooler(EncoderPooler):
             for _ in range(n_experts)
         ])
         self._config = {'input_dim': input_dim, 'output_dim': output_dim, 'n_experts': n_experts}
-        self.load_balancing_loss = None
 
 
     def forward(self, token_embeddings: Tensor = None, **kwargs):
         expert_logits, expert_probs = self.router(token_embeddings) # (batch_size, seq_len, n_experts)
 
         expert_dist = expert_probs.view(-1, self.n_experts).mean(dim=0) # (n_experts,)
-        self.load_balancing_loss = torch.sum(expert_dist * torch.log(expert_dist))
+        load_balancing_loss = torch.sum(expert_dist * torch.log(expert_dist))
 
         expert_probs = expert_probs.unsqueeze(-1) # (batch_size, seq_len, n_experts, 1)
         expert_outputs = torch.stack([expert(token_embeddings) for expert in self.experts], dim=2) # (batch_size, seq_len, n_experts, output_dim)
         outputs = torch.sum(expert_probs * expert_outputs, dim=2) # (batch_size, seq_len, output_dim)
-        return outputs
+        return outputs, load_balancing_loss

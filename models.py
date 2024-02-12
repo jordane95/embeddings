@@ -30,7 +30,7 @@ class EncoderOutput(ModelOutput):
     d_reps: Optional[Tensor] = None
     loss: Optional[Tensor] = None
     scores: Optional[Tensor] = None
-    load_balancing_loss: Optional[Tensor] = None
+    load_balancing_loss: Optional[float] = None
 
 
 class AutoModelForSentenceEmbedding(nn.Module):
@@ -73,6 +73,8 @@ class AutoModelForSentenceEmbedding(nn.Module):
 
         self.cross_entropy = nn.CrossEntropyLoss(reduction='mean')
 
+        self.load_balancing_loss = 0
+
     def encode(self, texts):
         if texts is None:
             return None
@@ -87,7 +89,11 @@ class AutoModelForSentenceEmbedding(nn.Module):
         # original embedding
         embeddings = self.pool_sentence_embedding(last_hidden_state, pooling_mask)
         # pooler embedding
-        pooled_reps = self.pooler(last_hidden_state) # (bs, seq_len, emb_dim)
+        if self.add_pooler == 'moe':
+            pooled_reps, load_balancing_loss = self.pooler(last_hidden_state)
+            self.load_balancing_loss += load_balancing_loss
+        else:
+            pooled_reps = self.pooler(last_hidden_state) # (bs, seq_len, emb_dim)
         pooled_embeddings = self.pool_sentence_embedding(pooled_reps, pooling_mask)
 
         if self.add_pooler:
@@ -161,6 +167,7 @@ class AutoModelForSentenceEmbedding(nn.Module):
         loss_scale: float = 1.0,
         full_contrastive_loss: bool = True,
     ):
+        self.load_balancing_loss = 0
         q_embeddings = self.encode(query) # (batch_size, embedding_dim)
         d_embeddings = self.encode(doc)
 
@@ -248,6 +255,7 @@ class AutoModelForEmbeddingMNKD(AutoModelForSentenceEmbedding):
     def __init__(self, *args, **kwargs):
         super(AutoModelForEmbeddingMNKD, self).__init__(*args, **kwargs)
         self.kl = nn.KLDivLoss(reduction="batchmean")
+        self.load_balancing_loss = 0
 
     def forward(
         self,
@@ -262,6 +270,7 @@ class AutoModelForEmbeddingMNKD(AutoModelForSentenceEmbedding):
         contrastive_loss_weight: float = 0.2,
         load_balancing_loss_ratio: float = 0.0,
     ):
+        self.load_balancing_loss = 0
         q_embeddings = self.encode(query) # (batch_size, embedding_dim)
         p_embeddings = self.encode(pos) # (batch_size, embedding_dim)
         n_embeddings = self.encode(negs) # (batch_size * num_neg, embedding_dim)
@@ -297,10 +306,8 @@ class AutoModelForEmbeddingMNKD(AutoModelForSentenceEmbedding):
         if teacher_score is not None:
             loss = kl_loss + self.contrastive_loss_weight * loss
         
-        load_balancing_loss = None
         if self.add_pooler == 'moe' and self.load_balancing_loss_ratio > 0:
-            load_balancing_loss = self.pooler.load_balancing_loss
-            loss += self.load_balancing_loss_ratio * load_balancing_loss
+            loss += self.load_balancing_loss_ratio * self.load_balancing_loss
 
         # import pdb; pdb.set_trace()
         return EncoderOutput(
@@ -308,5 +315,5 @@ class AutoModelForEmbeddingMNKD(AutoModelForSentenceEmbedding):
             d_reps=d_embeddings,
             scores=scores,
             loss=loss,
-            load_balancing_loss=load_balancing_loss,
+            load_balancing_loss=self.load_balancing_loss.item(),
         )
