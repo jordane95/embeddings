@@ -11,7 +11,7 @@ from transformers import AutoTokenizer
 from models import AutoModelForSentenceEmbedding
 from mteb import MTEB, AbsTaskRetrieval, DRESModel
 
-from utils import logger, move_to_cuda
+from utils import logger, move_to_cuda, TASK_LIST
 
 
 def get_args():
@@ -108,6 +108,8 @@ if __name__ == "__main__":
     for task in task_names:
         # if args.dry_run and task not in ['SciFact', 'FiQA2018']:
         #     continue
+        if task not in TASK_LIST:
+            continue
 
         logger.info('Processing task: {}'.format(task))
 

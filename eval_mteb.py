@@ -12,7 +12,7 @@ from mteb import MTEB
 
 from models import AutoModelForSentenceEmbedding
 
-from utils import logger, move_to_cuda
+from utils import logger, move_to_cuda, TASK_LIST
 
 
 def get_args():
@@ -114,13 +114,16 @@ if __name__ == "__main__":
         task_name: str = task_cls.description['name']
         task_type: str = task_cls.description['type']
 
+        if task_name not in TASK_LIST:
+            continue
+
         # disable l2 normalize for classification tasks, as it achieves slightly better results
-        # if task_type == 'Classification':
-        #     logger.info('Set l2_normalize to False for classification task')
-        #     model.l2_normalize = False
-        # else:
-        #     model.l2_normalize = True
-        #     logger.info('Set l2_normalize to {}'.format(model.l2_normalize))
+        if task_type == 'Classification':
+            logger.info('Set l2_normalize to False for classification task')
+            model.encoder.normalize = False
+        else:
+            model.encoder.normalize = True
+            logger.info('Set l2_normalize to {}'.format(model.encoder.normalize))
 
         sub_eval = MTEB(tasks=[task_name], task_langs=['en'] if not args.multilingual else None)
         logger.info('Running evaluation for task: {}, type: {}'.format(task_name, task_type))
