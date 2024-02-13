@@ -29,6 +29,7 @@ class ModelArguments:
     peft: bool = field(default=False)
 
     n_experts: int = field(default=8, metadata={"help": "Number of experts, only useful when add pooler is 'moe'"})
+    topk: int = field(default=2, metadata={"help": "Activate top k experts for sparse moe"})
     residual_pooler: bool = field(default=False, metadata={"help": "Add a residual connection of the original embedding?"})
     
     # for Jax training

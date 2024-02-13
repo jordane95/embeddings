@@ -15,12 +15,13 @@ from utils import dist_gather_tensor, full_contrastive_scores_and_labels
 
 logger = logging.getLogger(__name__)
 
-from poolers import DensePooler, MoEPooler
+from poolers import DensePooler, MoEPooler, SparseMoEPooler
 
 
 POOLER_TYPE = {
     "dense": DensePooler,
     "moe": MoEPooler,
+    "sparsemoe": SparseMoEPooler,
 }
 
 
@@ -43,6 +44,7 @@ class AutoModelForSentenceEmbedding(nn.Module):
         add_pooler: str = None,
         peft: bool = False,
         n_experts: int = 8,
+        topk: int = 2,
         residual_pooler: bool = False,
         **kwargs,
     ):
@@ -59,6 +61,8 @@ class AutoModelForSentenceEmbedding(nn.Module):
                 self.pooler = DensePooler(input_dim=self.config.hidden_size, output_dim=self.config.hidden_size)
             elif self.add_pooler == 'moe':
                 self.pooler = MoEPooler(input_dim=self.config.hidden_size, output_dim=self.config.hidden_size, n_experts=n_experts)
+            elif self.add_pooler == 'sparsemoe':
+                self.pooler = SparseMoEPooler(input_dim=self.config.hidden_size, output_dim=self.config.hidden_size, n_experts=n_experts, k=topk)
             else:
                 raise NotImplementedError(f"{self.add_pooler} type poolyer not supported!")
         else:
@@ -89,7 +93,7 @@ class AutoModelForSentenceEmbedding(nn.Module):
         # original embedding
         embeddings = self.pool_sentence_embedding(last_hidden_state, pooling_mask)
         # pooler embedding
-        if self.add_pooler == 'moe':
+        if 'moe' in self.add_pooler:
             pooled_reps, load_balancing_loss = self.pooler(last_hidden_state)
             self.load_balancing_loss += load_balancing_loss
         else:
@@ -274,6 +278,7 @@ class AutoModelForEmbeddingMNKD(AutoModelForSentenceEmbedding):
         q_embeddings = self.encode(query) # (batch_size, embedding_dim)
         p_embeddings = self.encode(pos) # (batch_size, embedding_dim)
         n_embeddings = self.encode(negs) # (batch_size * num_neg, embedding_dim)
+        self.load_balancing_loss /= 3 # since we have 3 forward pass
 
         kl_loss = 0.0
         self.contrastive_loss_weight = contrastive_loss_weight
@@ -306,7 +311,8 @@ class AutoModelForEmbeddingMNKD(AutoModelForSentenceEmbedding):
         if teacher_score is not None:
             loss = kl_loss + self.contrastive_loss_weight * loss
         
-        if self.add_pooler == 'moe' and self.load_balancing_loss_ratio > 0:
+        if 'moe' in self.add_pooler and self.load_balancing_loss_ratio > 0:
+            # print("load_balancing_loss_ratio", self.load_balancing_loss_ratio)
             loss += self.load_balancing_loss_ratio * self.load_balancing_loss
 
         # import pdb; pdb.set_trace()

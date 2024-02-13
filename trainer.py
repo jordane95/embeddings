@@ -123,6 +123,8 @@ class EmbeddingTrainer(Trainer):
             negatives_x_device=negatives_x_device,
             loss_scale=self._dist_loss_scale_factor if negatives_x_device else 1.0,
             full_contrastive_loss=self.args.full_contrastive_loss,
+            contrastive_loss_weight=self.args.contrastive_loss_weight,
+            load_balancing_loss_ratio=self.args.load_balancing_loss_ratio,
         )
 
         if self.model.training:

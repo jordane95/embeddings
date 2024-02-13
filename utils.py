@@ -233,6 +233,8 @@ class AverageMeter(object):
     def __str__(self):
         return '{}: {}'.format(self.name, round(self.avg, self.round_digits))
 
+    def value(self):
+        return round(self.avg, self.round_digits)
 
 if __name__ == '__main__':
     query = torch.randn(4, 16)

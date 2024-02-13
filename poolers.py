@@ -6,6 +6,10 @@ from torch import nn
 from torch import Tensor
 from torch.nn import functional as F
 
+
+from parallel_linear import MoE
+
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -80,4 +84,20 @@ class MoEPooler(EncoderPooler):
         expert_probs = expert_probs.unsqueeze(-1) # (batch_size, seq_len, n_experts, 1)
         expert_outputs = torch.stack([expert(token_embeddings) for expert in self.experts], dim=2) # (batch_size, seq_len, n_experts, output_dim)
         outputs = torch.sum(expert_probs * expert_outputs, dim=2) # (batch_size, seq_len, output_dim)
+        return outputs, load_balancing_loss
+
+
+class SparseMoEPooler(EncoderPooler):
+    def __init__(self, input_dim: int = 768, output_dim: int = 768, n_experts: int = 8, k: int = 2,
+                 cvloss: float = 0, switchloss: float = 0.01, zloss: float = 0.001):
+        super(SparseMoEPooler, self).__init__()
+        self.moe_layer = MoE(input_dim, output_dim, n_experts, k, activation=self.activation_fn, cvloss=cvloss, switchloss=switchloss, zloss=zloss)
+        self._config = {'input_dim': input_dim, 'output_dim': output_dim, 'n_experts': n_experts, 'topk': k}
+
+    def activation_fn(self, x):
+        # relu + dropout
+        return F.dropout(F.relu(x), p=0.1)
+
+    def forward(self, token_embeddings: Tensor = None, **kwargs):
+        outputs, load_balancing_loss = self.moe_layer(token_embeddings) # (batch_size, seq_len, output_dim)
         return outputs, load_balancing_loss

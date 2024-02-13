@@ -118,6 +118,7 @@ def main():
         embedding_dim=model_args.embedding_dim,
         peft=model_args.peft,
         n_experts=model_args.n_experts,
+        topk=model_args.topk,
         residual_pooler=model_args.residual_pooler,
         cache_dir=model_args.cache_dir,
     )
