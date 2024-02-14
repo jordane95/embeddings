@@ -349,7 +349,8 @@ def get_mteb_average(meta_data_path: str):
     
     try:
         DATA_OVERALL.insert(2, f"Classification Average ({len(TASK_LIST_CLASSIFICATION)} datasets)", DATA_OVERALL[TASK_LIST_CLASSIFICATION].mean(axis=1, skipna=False))
-    
+    except:
+        pass
     
     try:
         DATA_OVERALL.insert(3, f"Clustering Average ({len(TASK_LIST_CLUSTERING)} datasets)", DATA_OVERALL[TASK_LIST_CLUSTERING].mean(axis=1, skipna=False))
@@ -383,6 +384,8 @@ def get_mteb_average(meta_data_path: str):
 
     # Fill NaN after averaging
     DATA_OVERALL.fillna("", inplace=True)
+
+    print(DATA_OVERALL)
 
     DATA_OVERALL = DATA_OVERALL[["Model", f"Classification Average ({len(TASK_LIST_CLASSIFICATION)} datasets)", f"Clustering Average ({len(TASK_LIST_CLUSTERING)} datasets)", f"Pair Classification Average ({len(TASK_LIST_PAIR_CLASSIFICATION)} datasets)", f"Reranking Average ({len(TASK_LIST_RERANKING)} datasets)", f"Retrieval Average ({len(TASK_LIST_RETRIEVAL)} datasets)", f"STS Average ({len(TASK_LIST_STS)} datasets)", f"Summarization Average ({len(TASK_LIST_SUMMARIZATION)} dataset)", f"Average ({len(TASK_LIST_EN)} datasets)",]]
     DATA_OVERALL = DATA_OVERALL[DATA_OVERALL.iloc[:, 1:].ne("").any(axis=1)]
