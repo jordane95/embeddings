@@ -25,6 +25,7 @@ def get_args():
     parser.add_argument('--normalize', action='store_true', help='normalize embeddings?')
     parser.add_argument('--add-pooler', default=None, type=str, help='projection head type')
     parser.add_argument('--n-experts', default=8, type=int, help='number of experts')
+    parser.add_argument('--topk', default=2, type=int, help='topk activation experts')
     parser.add_argument('--residual-pooler', action='store_true', help='add residual conntection to pooler')
 
     args = parser.parse_args()
@@ -51,6 +52,7 @@ class RetrievalModel(DRESModel):
             normalize=args.normalize,
             add_pooler=args.add_pooler,
             n_experts=args.n_experts,
+            topk=args.topk,
             residual_pooler=args.residual_pooler,
         ).load_pretrained(args.model_name_or_path)
         self.tokenizer = AutoTokenizer.from_pretrained(args.model_name_or_path)
