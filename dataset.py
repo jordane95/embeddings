@@ -110,10 +110,10 @@ class RetrievalDataset(torch.utils.data.Dataset):
 
         query_negs = self.train_negative[qid][:self.sample_neg_from_topk]
         if len(query_negs) < self.train_group_size - 1:
-            negs = random.sample(self.corpus_id.keys(), k=self.train_group_size - 1 - len(query_negs))
+            negs = random.choices(self.corpus_id.keys(), k=self.train_group_size - 1 - len(query_negs))
             negs.extend(query_negs)
         else:
-            negs = random.choices(query_negs, k=self.train_group_size - 1)
+            negs = random.sample(query_negs, k=self.train_group_size - 1)
 
         neg_docs = [] # List[str]
         for neg_id in negs:
@@ -144,7 +144,7 @@ class MSMARCODataset(torch.utils.data.Dataset):
             neg_ids = [random.randrange(len(self.corpus)) for _ in range(self.train_group_size - 1 - len(query_negs))]
             neg_ids.extend(query_negs)
         else:
-            neg_ids = random.choices(query_negs, k=self.train_group_size - 1)
+            neg_ids = random.sample(query_negs, k=self.train_group_size - 1)
         negs = [self.corpus[neg_id]['title'] + " " + self.corpus[neg_id]['contents'] for neg_id in neg_ids] # List[str]
         return {"query": query, "pos": pos, "negs": negs}
 
@@ -176,12 +176,12 @@ class NQDataset(torch.utils.data.Dataset):
         negative_size = self.train_group_size - 1
         if len(negatives) == 0:
             # randomly sample negatives from other examples
-            samples = random.sample(self.dataset, k=negative_size)
+            samples = random.choices(self.dataset, k=negative_size)
             negs = [random.choice(sample['positive_ctxs']) for sample in samples]
         elif len(negatives) < negative_size: # TODO: sampling duplicate negatives is not compatible with full contrastive loss
-            negs = random.sample(negatives, k=negative_size)
-        else:
             negs = random.choices(negatives, k=negative_size)
+        else:
+            negs = random.sample(negatives, k=negative_size)
         negs = [self.get_doc_text(neg) for neg in negs] # List[str]
         return {"query": query, "pos": pos, "negs": negs}
 
@@ -283,10 +283,10 @@ class BERRIDataset(torch.utils.data.Dataset):
         if len(item["hard_negative_ctxs"]) < self.train_group_size - 1:
             negs.extend([self.verbalize_doc(neg) for neg in item["hard_negative_ctxs"]])
             # pad to train_group_size with random negs from 'negative_ctxs' (whose amount may not be enough)
-            random_negs = random.sample(item["negative_ctxs"], k=self.train_group_size - 1 - len(negs))
+            random_negs = random.choices(item["negative_ctxs"], k=self.train_group_size - 1 - len(negs))
             negs.extend([self.verbalize_doc(neg) for neg in random_negs])
         else:
-            negatives = random.choices(item["hard_negative_ctxs"], k=self.train_group_size - 1)
+            negatives = random.sample(item["hard_negative_ctxs"], k=self.train_group_size - 1)
             negs.extend([self.verbalize_doc(neg) for neg in negatives])
 
         return {"query": query, "pos": pos, "negs": negs}
