@@ -178,7 +178,6 @@ class NQDataset(torch.utils.data.Dataset):
             # pad to train_group_size with random negs from 'negative_ctxs' (whose amount may not be enough)
             random_negs = random.choices(item["negative_ctxs"], k=self.train_group_size - 1 - len(negs))
             negs.extend(random_negs)
-            negs = random.choices(negatives, k=negative_size)
         else:
             negs = random.sample(negatives, k=negative_size)
         negs = [self.get_doc_text(neg) for neg in negs] # List[str]
