@@ -172,12 +172,16 @@ class NQDataset(torch.utils.data.Dataset):
         pos = self.get_doc_text(pos)
         negatives = item['hard_negative_ctxs']
         negative_size = self.train_group_size - 1
-        negs = []
-        if len(negatives) < negative_size: # TODO: sampling duplicate negatives is not compatible with full contrastive loss
-            negs.extend(negatives)
-            # pad to train_group_size with random negs from 'negative_ctxs' (whose amount may not be enough)
-            random_negs = random.choices(item["negative_ctxs"], k=self.train_group_size - 1 - len(negs))
-            negs.extend(random_negs)
+        if len(negatives) == 0:
+            negatives = item['negative_ctxs']
+            if len(negatives) == 0:
+                # randomly sample negatives from other examples
+                samples = random.choices(self.dataset, k=negative_size)
+                negs = [random.choice(sample['positive_ctxs']) for sample in samples]
+            else:
+                negs = random.choices(negatives, k=negative_size)
+        elif len(negatives) < negative_size: # TODO: sampling duplicate negatives is not compatible with full contrastive loss
+            negs = random.choices(negatives, k=negative_size)
         else:
             negs = random.sample(negatives, k=negative_size)
         negs = [self.get_doc_text(neg) for neg in negs] # List[str]
