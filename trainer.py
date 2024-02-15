@@ -2,6 +2,8 @@ import os
 from itertools import repeat
 from typing import Dict, List, Tuple, Optional, Any, Union
 
+from transformers import PretrainedConfig
+from transformers import __version__
 from transformers.trainer import Trainer
 from transformers.trainer_utils import has_length
 from transformers.trainer_pt_utils import ShardSampler
@@ -25,6 +27,9 @@ except ModuleNotFoundError:
 
 
 TRAINING_ARGS_NAME = "training_args.bin"
+WEIGHTS_NAME = "pytorch_model.bin"
+WEIGHTS_INDEX_NAME = "pytorch_model.bin.index.json"
+CONFIG_NAME = "config.json"
 
 
 class EmbeddingTrainer(Trainer):
@@ -137,6 +142,34 @@ class EmbeddingTrainer(Trainer):
         negatives_x_device = self.args.negatives_x_device and not disable_x_device
         loss_scale_factor = self._dist_loss_scale_factor if negatives_x_device else 1.0
         return super(EmbeddingTrainer, self).training_step(*args) / loss_scale_factor
+    
+    def _load_from_checkpoint(self, resume_from_checkpoint, model=None):
+        if model is None:
+            model = self.model
+
+        if not os.path.isfile(os.path.join(resume_from_checkpoint, WEIGHTS_NAME)) and not os.path.isfile(
+            os.path.join(resume_from_checkpoint, WEIGHTS_INDEX_NAME)
+        ):
+            raise ValueError(f"Can't find a valid checkpoint at {resume_from_checkpoint}")
+
+        logger.info(f"Loading model from {resume_from_checkpoint}.")
+
+        if os.path.isfile(os.path.join(resume_from_checkpoint, CONFIG_NAME)):
+            config = PretrainedConfig.from_json_file(os.path.join(resume_from_checkpoint, CONFIG_NAME))
+            checkpoint_version = config.transformers_version
+            if checkpoint_version is not None and checkpoint_version != __version__:
+                logger.warning(
+                    f"You are resuming training from a checkpoint trained with {checkpoint_version} of "
+                    f"Transformers but your current version is {__version__}. This is not recommended and could "
+                    "yield to errors or unwanted behaviors."
+                )
+
+        if self.args.deepspeed:
+            # will be resumed in deepspeed_init
+            pass
+        elif os.path.isfile(os.path.join(resume_from_checkpoint, WEIGHTS_NAME)):
+            model.load_pretrained(resume_from_checkpoint)
+
 
 
 def split_dense_inputs(model_input: dict, chunk_size: int):

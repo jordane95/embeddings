@@ -274,7 +274,7 @@ class AutoModelForEmbeddingMNKD(AutoModelForSentenceEmbedding):
         contrastive_loss_weight: float = 0.2,
         load_balancing_loss_ratio: float = 0.0,
     ):
-        self.load_balancing_loss = 0
+        self.load_balancing_loss = torch.tensor(0.0, device=query['input_ids'].device)
         q_embeddings = self.encode(query) # (batch_size, embedding_dim)
         p_embeddings = self.encode(pos) # (batch_size, embedding_dim)
         n_embeddings = self.encode(negs) # (batch_size * num_neg, embedding_dim)

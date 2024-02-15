@@ -1,5 +1,5 @@
 
-export CUDA_VISIBLE_DEVICES=1
+export CUDA_VISIBLE_DEVICES=0
 
 # torchrun --nproc_per_node 2 train.py \
 # python train.py \
@@ -27,9 +27,9 @@ python finetune_mnkd.py \
     --num_train_epochs 1 \
     --learning_rate 2e-5 \
     --logging_steps 500 \
-    --save_steps 1000 \
+    --save_steps 10 \
     --warmup_ratio 0.1 \
-    --per_device_train_batch_size 32 \
+    --per_device_train_batch_size 8 \
     --q_max_len 512 \
     --d_max_len 512 \
     --normalize True \
