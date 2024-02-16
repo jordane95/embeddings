@@ -274,7 +274,7 @@ class MEDI2Dataset(torch.utils.data.Dataset):
         pos = random.choice(item['pos']) # [instruction, doc]
         negatives = item['neg'] # [[instruction, doc], ...]
         if len(negatives) < self.train_group_size - 1:
-            random_negs = [random.choice(item['pos']) for item in random.choices(self.data, k=self.train_grou_size - 1 - len(negatives))]
+            random_negs = [random.choice(item['pos']) for item in random.choices(self.data, k=self.train_group_size - 1 - len(negatives))]
             negs = negatives + random_negs
         else:
             negs = random.sample(negatives, k=self.train_group_size - 1)
