@@ -9,8 +9,8 @@ import numpy as np
 import torch
 from transformers import PreTrainedTokenizer, BatchEncoding, DataCollatorWithPadding
 
-from dataset import RetrievalDataset, MSMARCODataset, NLIDataset, NQDataset, MEDIDataset, BERRIDataset
-from dataset import load_berri_data, load_medi_data
+from dataset import RetrievalDataset, MSMARCODataset, NLIDataset, NQDataset, MEDIDataset, BERRIDataset, MEDI2Dataset
+from dataset import load_berri_data, load_medi_data, load_medi2_data
 
 from utils import normalize_instruction
 
