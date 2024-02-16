@@ -27,11 +27,13 @@ DATASET_CLS = {
     "NLI": NLIDataset,
     "MEDI": MEDIDataset,
     "BERRI": BERRIDataset,
+    "MEDI2": MEDI2Dataset,
 }
 
 LOADER_FUNC = {
     "MEDI": load_medi_data,
     "BERRI": load_berri_data,
+    "MEDI2": load_medi2_data,
 }
 
 class MultiDatasetMNKD(torch.utils.data.Dataset):

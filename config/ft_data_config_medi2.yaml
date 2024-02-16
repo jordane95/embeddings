@@ -24,7 +24,7 @@
   data_path: data/MEDI2/
   train_group_size: 8
 
-- name: BERRI
-  data_file: data/berri/train_mixed.jsonl
-  instruction_file: data/berri/berri_instructions.tsv
-  train_group_size: 8
+# - name: BERRI
+#   data_file: data/berri/train_mixed.jsonl
+#   instruction_file: data/berri/berri_instructions.tsv
+#   train_group_size: 8

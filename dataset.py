@@ -241,6 +241,48 @@ class MEDIDataset(torch.utils.data.Dataset):
         return {"query": query, "pos": pos, "negs": negs}
 
 
+def load_medi2_data(data_config):
+    data_path = data_config['data_path']
+    task_to_dataset: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
+    for filename in os.listdir(data_path):
+        if filename.endswith('.jsonl'):
+            dataset = []
+            with open(os.path.join(data_path, filename), 'r') as f:
+                for line in f:
+                    try:
+                        item = json.loads(line)
+                        dataset.append(item)
+                    except Exception as e:
+                        print(f"Error: {e}")
+                        print(line)
+            if len(dataset) > 0:
+                task_to_dataset[filename.strip('.jsonl')] = dataset
+    return task_to_dataset
+
+
+class MEDI2Dataset(torch.utils.data.Dataset):
+    def __init__(self, data: List[Any], train_group_size: int = 16):
+        self.data: List[Dict[str, Any]] = data
+        self.train_group_size = train_group_size
+
+    def __len__(self):
+        return len(self.data)
+    
+    def __getitem__(self, idx):
+        item = self.data[idx]
+        query = item['query'] # [instruction, query]
+        pos = random.choice(item['pos']) # [instruction, doc]
+        negatives = item['neg'] # [[instruction, doc], ...]
+        if len(negatives) < self.train_group_size - 1:
+            random_negs = [random.choice(item['pos']) for item in random.choices(self.data, k=self.train_grou_size - 1 - len(negatives))]
+            negs = negatives + random_negs
+        else:
+            negs = random.sample(negatives, k=self.train_group_size - 1)
+        return {"query": query, "pos": pos, "negs": negs}
+
+
+
+
 def load_berri_data(data_config):
     data_path, instruction_path = data_config['data_file'], data_config['instruction_file']
     instruction_to_dataset: Dict[str, str] = {}
