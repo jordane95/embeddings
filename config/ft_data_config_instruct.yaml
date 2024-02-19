@@ -20,12 +20,12 @@
 #   data_file: data/medi/medi-data.json
 #   train_group_size: 8 # useless for now
 
-- name: MEDI2
-  data_path: data/MEDI2/
-  train_group_size: 8
+# - name: MEDI2
+#   data_path: data/MEDI2/
+#   train_group_size: 8
 
 - name: BERRI
   data_file: data/berri/train_mixed.jsonl
   instruction_file: data/berri/berri_instructions.tsv
   train_group_size: 8
-  instruct: false
+  instruct: true

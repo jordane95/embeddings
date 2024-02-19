@@ -285,6 +285,7 @@ class MEDI2Dataset(torch.utils.data.Dataset):
 
 def load_berri_data(data_config):
     data_path, instruction_path = data_config['data_file'], data_config['instruction_file']
+    instruct = data_config['instruct']
     instruction_to_dataset: Dict[str, str] = {}
     with open(instruction_path, 'r') as f:
         headers = next(f)
@@ -300,6 +301,8 @@ def load_berri_data(data_config):
             item = json.loads(line)
             instruction, query = item['question'].strip().split(' [SEP] ')
             task_name = instruction_to_dataset.get(instruction, 'unk')
+            if instruct:
+                query = [instruction, query]
             item['query'] = query
             item['task'] = task_name
             task_to_dataset[task_name].append(item)

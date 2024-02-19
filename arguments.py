@@ -89,7 +89,7 @@ class DataArguments:
     )
 
     mask_instruction_pooling: bool = field(
-        default=True, metadata={"help": "Whether or not mask instruction tokens during pooling."}
+        default=False, metadata={"help": "Whether or not mask instruction tokens during pooling."}
     )
 
     finetune_data_path: str = field(default=None, metadata={"help": "Path to the json file for finetuning."})

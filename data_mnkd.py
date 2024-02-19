@@ -116,8 +116,8 @@ class TripleCollatorMNKD(DataCollatorWithPadding):
             if key == 'negs': # for negs
                 texts = sum(texts, [])
             # print(text)
-            if self.with_instruction: # add instruction
-                assert isinstance(texts[0], list), "No instruction in input text."
+            if self.with_instruction and isinstance(texts[0], list): # add instruction
+                # assert isinstance(texts[0], list), "No instruction in input text."
                 instructions = [normalize_instruction(text[0]) for text in texts]
                 # it seems that some instructions are dropped out in medi data
                 texts = ['{}: {}'.format(instruction, text[1]) for instruction, text in zip(instructions, texts)]
@@ -132,7 +132,8 @@ class TripleCollatorMNKD(DataCollatorWithPadding):
                     return_attention_mask=True,
                 )['attention_mask'] # Tensor shape (batch_size, max_seq_len)
                 # instruction_mask[:, 0] = 0 # unmask cls tokens # commented out since this only works for bert-family models
-            else: # do not add instruction
+            else:
+                # if self.with_instruction: print("No instruction in text, won't use")
                 if isinstance(texts[0], list): # if input format is [instruction, text] with instruction
                     texts = [text[1] for text in texts] # List[str]
                 if self.with_prompt: # if add simple prompt
