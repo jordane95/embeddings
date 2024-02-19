@@ -93,7 +93,7 @@ class AutoModelForSentenceEmbedding(nn.Module):
         # original embedding
         embeddings = self.pool_sentence_embedding(last_hidden_state, pooling_mask)
         # pooler embedding
-        if 'moe' in self.add_pooler:
+        if self.add_pooler and 'moe' in self.add_pooler:
             pooled_reps, load_balancing_loss = self.pooler(last_hidden_state)
             self.load_balancing_loss += load_balancing_loss
         else:
@@ -311,7 +311,7 @@ class AutoModelForEmbeddingMNKD(AutoModelForSentenceEmbedding):
         if teacher_score is not None:
             loss = kl_loss + self.contrastive_loss_weight * loss
         
-        if 'moe' in self.add_pooler and self.load_balancing_loss_ratio > 0:
+        if self.add_pooler and 'moe' in self.add_pooler and self.load_balancing_loss_ratio > 0:
             # print("load_balancing_loss_ratio", self.load_balancing_loss_ratio)
             loss += self.load_balancing_loss_ratio * self.load_balancing_loss
 
