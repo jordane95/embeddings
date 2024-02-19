@@ -28,6 +28,8 @@ def get_args():
     parser.add_argument('--topk', default=2, type=int, help='topk activation experts')
     parser.add_argument('--residual-pooler', action='store_true', help='add residual conntection to pooler')
 
+    parser.add_argument('--instruct', action='store_true', help='evaluation with instruction')
+
     args = parser.parse_args()
 
     logger.info('Args: {}'.format(json.dumps(args.__dict__, ensure_ascii=False, indent=4)))
@@ -66,7 +68,7 @@ class RetrievalModel(DRESModel):
             self.encoder = torch.nn.DataParallel(self.encoder)
 
     def encode_queries(self, queries: List[str], **kwargs) -> np.ndarray:
-        input_texts = queries
+        input_texts = [self.prompt + q for q in queries]
         return self._do_encode(input_texts)
 
     def encode_corpus(self, corpus: List[Dict[str, str]], **kwargs) -> np.ndarray:
@@ -97,6 +99,8 @@ class RetrievalModel(DRESModel):
 
         return np.concatenate(encoded_embeds, axis=0)
 
+    def set_prompt(self, prompt: str):
+        self.prompt = prompt
 
 if __name__ == "__main__":
     args = get_args()
@@ -115,13 +119,12 @@ if __name__ == "__main__":
 
         logger.info('Processing task: {}'.format(task))
 
-        # if args.prefix_type == 'query_or_passage':
-        #     args.doc_as_query = task in ['QuoraRetrieval']
-        # else:
-        #     task_def: str = get_task_def_by_task_name_and_type(task_name=task, task_type='Retrieval')
-        #     prompt: str = get_detailed_instruct(task_def)
-        #     model.set_prompt(prompt=prompt)
-        #     logger.info('Set prompt: {}'.format(prompt))
+        if args.instruct:
+            task_def: str = get_task_def_by_task_name_and_type(task_name=task, task_type='Retrieval')
+            # prompt: str = get_detailed_instruct(task_def)
+            prompt = task_def
+            model.set_prompt(prompt=prompt)
+            logger.info('Set prompt: {}'.format(prompt))
 
         evaluation = MTEB(tasks=[task], task_langs=['en'])
         evaluation.run(model, eval_splits=["test" if task not in ['MSMARCO'] else 'dev'],

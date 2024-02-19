@@ -12,7 +12,7 @@ from mteb import MTEB
 
 from models import AutoModelForSentenceEmbedding
 
-from utils import logger, move_to_cuda, TASK_LIST
+from utils import logger, move_to_cuda, TASK_LIST, get_task_def_by_task_name_and_type
 
 
 def get_args():
@@ -28,6 +28,8 @@ def get_args():
     parser.add_argument('--n-experts', default=8, type=int, help='number of experts')
     parser.add_argument('--topk', default=2, type=int, help='topk activation experts')
     parser.add_argument('--residual-pooler', action='store_true', help='add residual conntection to pooler')
+
+    parser.add_argument('--instruct', action='store_true', help='add instruction')
 
     args = parser.parse_args()
 
@@ -65,6 +67,8 @@ class DenseEncoder(torch.nn.Module):
 
         if self.gpu_count > 1:
             self.encoder = torch.nn.DataParallel(self.encoder)
+        
+        self.prompt = ""
 
     @torch.no_grad()
     def encode(self, sentences, **kwargs) -> np.ndarray:
@@ -77,7 +81,7 @@ class DenseEncoder(torch.nn.Module):
             `List[np.ndarray]` or `List[tensor]`: List of embeddings for the given sentences
         """
 
-        input_texts: List[str] = sentences
+        input_texts: List[str] = [self.prompt + s for s in sentences]
 
         encoded_embeds = []
         batch_size = 64 * self.gpu_count
@@ -101,6 +105,9 @@ class DenseEncoder(torch.nn.Module):
                 encoded_embeds.append(embeds.cpu().numpy())
 
         return np.concatenate(encoded_embeds, axis=0)
+    
+    def set_prompt(self, prompt: str):
+        self.prompt = prompt
 
 
 if __name__ == "__main__":
@@ -127,6 +134,12 @@ if __name__ == "__main__":
         logger.info('Set l2_normalize to {}'.format(args.normalize))
 
         model = DenseEncoder(args)
+        if args.instruct:
+            task_def: str = get_task_def_by_task_name_and_type(task_name=task_name, task_type=task_type)
+            # prompt: str = get_detailed_instruct(task_def)
+            prompt = task_def
+            model.set_prompt(prompt=prompt)
+            logger.info('Set prompt: {}'.format(prompt))
         sub_eval = MTEB(tasks=[task_name], task_langs=['en'] if not args.multilingual else None)
         logger.info('Running evaluation for task: {}, type: {}'.format(task_name, task_type))
         eval_splits = ["test"] if "test" in task_cls.description["eval_splits"] else task_cls.description["eval_splits"]
