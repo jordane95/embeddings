@@ -11,7 +11,7 @@ from transformers import AutoTokenizer
 from models import AutoModelForSentenceEmbedding
 from mteb import MTEB, AbsTaskRetrieval, DRESModel
 
-from utils import logger, move_to_cuda, TASK_LIST
+from utils import logger, move_to_cuda, TASK_LIST, get_task_def_by_task_name_and_type
 
 
 def get_args():
