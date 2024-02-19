@@ -137,7 +137,7 @@ if __name__ == "__main__":
         if args.instruct:
             task_def: str = get_task_def_by_task_name_and_type(task_name=task_name, task_type=task_type)
             # prompt: str = get_detailed_instruct(task_def)
-            prompt = task_def
+            prompt = "{}: ".format(task_def)
             model.set_prompt(prompt=prompt)
             logger.info('Set prompt: {}'.format(prompt))
         sub_eval = MTEB(tasks=[task_name], task_langs=['en'] if not args.multilingual else None)
