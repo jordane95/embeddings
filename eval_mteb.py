@@ -31,6 +31,8 @@ def get_args():
 
     parser.add_argument('--instruct', action='store_true', help='add instruction')
 
+    parser.add_argument('--instruction_path', type=str, default='config/instruction_base.json', help="path to instructions for mteb")
+
     args = parser.parse_args()
 
     logger.info('Args: {}'.format(json.dumps(args.__dict__, ensure_ascii=False, indent=4)))
@@ -134,12 +136,19 @@ if __name__ == "__main__":
         logger.info('Set l2_normalize to {}'.format(args.normalize))
 
         model = DenseEncoder(args)
-        if args.instruct:
+        if args.instruct: # e5
             task_def: str = get_task_def_by_task_name_and_type(task_name=task_name, task_type=task_type)
             # prompt: str = get_detailed_instruct(task_def)
             prompt = "{}: ".format(task_def)
             model.set_prompt(prompt=prompt)
             logger.info('Set prompt: {}'.format(prompt))
+        elif args.instruction_path: # instructor
+            instructions = json.load(open(args.instruction_path))
+            prompt = instructions[task_type][task_name]
+            model.set_prompt(prompt=prompt)
+            logger.info('Set prompt: {}'.format(prompt))
+            
+
         sub_eval = MTEB(tasks=[task_name], task_langs=['en'] if not args.multilingual else None)
         logger.info('Running evaluation for task: {}, type: {}'.format(task_name, task_type))
         eval_splits = ["test"] if "test" in task_cls.description["eval_splits"] else task_cls.description["eval_splits"]

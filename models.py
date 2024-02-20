@@ -51,6 +51,7 @@ class AutoModelForSentenceEmbedding(nn.Module):
         super(AutoModelForSentenceEmbedding, self).__init__()
 
         self.lm = AutoModel.from_pretrained(model_name_or_path, **kwargs)
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name_or_path, **kwargs)
         self.pooling = pooling
         self.normalize = normalize
         self.add_pooler = add_pooler

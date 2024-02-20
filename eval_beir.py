@@ -30,6 +30,9 @@ def get_args():
 
     parser.add_argument('--instruct', action='store_true', help='evaluation with instruction')
 
+    parser.add_argument('--instruction_path', type=str, default='config/instruction_base.json', help="path to instructions for mteb")
+
+
     args = parser.parse_args()
 
     logger.info('Args: {}'.format(json.dumps(args.__dict__, ensure_ascii=False, indent=4)))
@@ -58,7 +61,11 @@ class RetrievalModel(DRESModel):
             residual_pooler=args.residual_pooler,
         ).load_pretrained(args.model_name_or_path)
         self.tokenizer = AutoTokenizer.from_pretrained(args.model_name_or_path)
-        self.prompt = ""
+
+        self.prompt = {
+            'query': '',
+            'corpus': '',
+        }
 
         self.gpu_count = torch.cuda.device_count()
 
@@ -69,11 +76,11 @@ class RetrievalModel(DRESModel):
             self.encoder = torch.nn.DataParallel(self.encoder)
 
     def encode_queries(self, queries: List[str], **kwargs) -> np.ndarray:
-        input_texts = [self.prompt + q for q in queries]
+        input_texts = [self.prompt['query'] + q for q in queries]
         return self._do_encode(input_texts)
 
     def encode_corpus(self, corpus: List[Dict[str, str]], **kwargs) -> np.ndarray:
-        input_texts = ['{} {}'.format(doc.get('title', ''), doc['text']).strip() for doc in corpus]
+        input_texts = [self.prompt['corpus'] + '{} {}'.format(doc.get('title', ''), doc['text']).strip() for doc in corpus]
         return self._do_encode(input_texts)
 
     @torch.no_grad()
@@ -100,8 +107,9 @@ class RetrievalModel(DRESModel):
 
         return np.concatenate(encoded_embeds, axis=0)
 
-    def set_prompt(self, prompt: str):
+    def set_prompt(self, prompt):
         self.prompt = prompt
+
 
 if __name__ == "__main__":
     args = get_args()
@@ -120,10 +128,15 @@ if __name__ == "__main__":
 
         logger.info('Processing task: {}'.format(task))
 
-        if args.instruct:
+        if args.instruct: # e5
             task_def: str = get_task_def_by_task_name_and_type(task_name=task, task_type='Retrieval')
             # prompt: str = get_detailed_instruct(task_def)
             prompt = "{}: ".format(task_def)
+            model.set_prompt(prompt=prompt)
+            logger.info('Set prompt: {}'.format(prompt))
+        elif args.instruction_path: # instructor
+            instructions = json.load(open(args.instruction_path))
+            prompt = instructions['Retrieval'][task]
             model.set_prompt(prompt=prompt)
             logger.info('Set prompt: {}'.format(prompt))
 

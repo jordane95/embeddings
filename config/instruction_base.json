@@ -1,0 +1,173 @@
+{
+  "Classification":{
+    "Banking77Classification":"Represent the bank purpose for classification: ",
+    "EmotionClassification":"Represent an emotion sentence for classifying if the sentence is positive or not: ",
+    "TweetSentimentExtractionClassification":"Represent a Twitter sentence for classification: ",
+    "AmazonCounterfactualClassification":"Represent an amazon sentence for classifying whether the sentence is counterfactual or not: ",
+    "ImdbClassification":"Represent an amazon review sentence for classifying emotion as positive or negative: ",
+    "MassiveIntentClassification":"represent the sentence for classifying its purpose asweather_query, audio_volume_other, iot_cleaning, datetime_query, lists_remove, lists_createoradd, datetime_convert, play_music, iot_hue_lightdim, calendar_remove, iot_coffee, general_greet, alarm_query, calendar_set, recommendation_locations, lists_query or email_query: ",
+    "MassiveScenarioClassification":"Represent a scene for determining the scene asplay, alarm, music, iot, audio, takeaway, datetime, recommendation, email, cooking, news or question answering: ",
+    "MTOPDomainClassification":"represent a sentence; ",
+    "MTOPIntentClassification":"Represent the sentence for determining its purpose as question_music, start_shuffle_music, get_call_time, get_reminder_location, is_true_recipes, ignore_call, get_contact_method, update_reminder, delete_alarm, set_default_provider_music, end_call, skip_track_music, create_timer, cancel_message, get_category_event, repeat_all_off_music, get_timer, add_time_timer, resume_music, add_to_playlist_music, update_reminder_location, set_rsvp_interested, pause_timer, update_timer, play_media, replay_music: ",
+    "ToxicConversationsClassification":"Represent a toxicity comment for classifying its toxicity as toxic or non-toxic: ",
+    "AmazonPolarityClassification":"Represent the sentiment comment for retrieving a duplicate sentence: ",
+    "AmazonReviewsClassification":"represent an amazon review sentence: "
+  },
+  "Clustering":{
+    "TwentyNewsgroupsClustering":"Represent the news comment for retrieval: ",
+    "BiorxivClusteringS2S":"Represent the biomedical statement for retrieval: ",
+    "MedrxivClusteringS2S":"Represent the medicine statement for retrieving duplicate sentences: ",
+    "ArxivClusteringP2P":"Represent the science passage for retrieval: ",
+    "ArxivClusteringS2S":"Represent the science statement for retrieval: ",
+    "BiorxivClusteringP2P":"Represent the Bio-medicine passage for retrieval: ",
+    "MedrxivClusteringP2P":"Represent the medicine paragraph for retrieval: ",
+    "RedditClustering":"represent a reddit community title: ",
+    "RedditClusteringP2P":"represent a Reddit community passage: ",
+    "StackExchangeClustering":"Represent the question for retrieval: ",
+    "StackExchangeClusteringP2P":"Represent the question and answer for retrieving duplicate question and answers: "
+  },
+  "PairClassification":{
+    "TwitterSemEval2015":"Represent the tweet post for retrieving duplicate comments: ",
+    "TwitterURLCorpus":"represent a tweet post for retrieval: ",
+    "SprintDuplicateQuestions":"represent the Sprint post for retrieving duplicate posts: "
+  },
+  "Reranking":{
+    "AskUbuntuDupQuestions":{
+      "query":"Represent the Ubuntu question for reranking: ",
+      "corpus":"Represent a Ubuntu question for reranking: "
+    },
+    "StackOverflowDupQuestions":{
+      "query":"Represent the StackOverflow question: ",
+      "corpus":"Represent a StackOverflow question: "
+    },
+    "SciDocsRR":{
+      "query":"Represent the Scientific title: ",
+      "corpus":"Represent the Scientific document: "
+    },
+    "MindSmallReranking":{
+      "query":"Represent the news query for retrieving articles: ",
+      "corpus":"Represent the news article for retrieval: "
+    }
+  },
+  "Retrieval":{
+    "ClimateFEVER":{
+      "query":"Represent the Climate question for retrieving supporting documents: ",
+      "corpus":"Represent the document for retrieval: "
+    },
+    "HotpotQA":{
+      "query":"Represent the Wikipedia question for retrieving supporting documents: ",
+      "corpus":"Represent the document for retrieval: "
+    },
+    "FEVER":{
+      "query":"Represent the fact for retrieving supporting evidence: ",
+      "corpus":"Represent the evidence for retrieval: "
+    },
+    "MSMARCO":{
+      "query":"Represent the question for retrieving supporting documents: ",
+      "corpus":"Represent the document for retrieval: "
+    },
+    "DBPedia":{
+      "query":"Represent the Wikipedia sentence for retrieving supporting documents: ",
+      "corpus":"Represent the document for retrieval: "
+    },
+    "NQ":{
+      "query":"Represent the Wikipedia question for retrieving supporting documents: ",
+      "corpus":"Represent the document for retrieval: "
+    },
+    "QuoraRetrieval":{
+      "query":"Represent the Quora question for retrieving duplicate questions: ",
+      "corpus":"Represent the Quora question for retrieving duplicate questions: "
+    },
+    "SCIDOCS":{
+      "query":"Represent a Science question for retrieving supporting papers: ",
+      "corpus":"Represent the Science paper: "
+    },
+    "TRECCOVID":{
+      "query":"Represent the Coronavirus question for retrieving supporting documents: ",
+      "corpus":"Represent the Coronavirus document for retrieval: "
+    },
+    "Touche2020":{
+      "query":"Represent a question: ",
+      "corpus":"Represent an argument: "
+    },
+    "SciFact":{
+      "query":"Represent a Scientific query for retrieving a supporting passage; ",
+      "corpus":"represent the Scientific passage for retrieval; "
+    },
+    "NFCorpus":{
+      "query":"Represent the Medicine question for retrieving a relevant document: ",
+      "corpus":"Represent the medical document for retrieval: "
+    },
+    "ArguAna":{
+      "query":"Represent the Debate argument for retrieving a counter-argument: ",
+      "corpus":"Represent the Counter debate argument: "
+    },
+    "CQADupstackTexRetrieval":{
+      "query":"Represent the question for retrieving answers: ",
+      "corpus":"Represent the answer for retrieval: "
+    },
+    "CQADupstackWebmastersRetrieval":{
+      "query":"Represent the Webmaster question for retrieving answers: ",
+      "corpus":"Represent the Webmaster answer: "
+    },
+    "CQADupstackEnglishRetrieval":{
+      "query":"Represent the English question for retrieving documents: ",
+      "corpus":"Represent the English answer for retrieval: "
+    },
+    "CQADupstackGamingRetrieval":{
+      "query":"Represent the Gaming question for retrieving answers: ",
+      "corpus":"Represent the Gaming answer for retrieval: "
+    },
+    "CQADupstackGisRetrieval":{
+      "query":"Represent the Gis question for retrieving answers: ",
+      "corpus":"Represent the Gis answer for retrieval: "
+    },
+    "CQADupstackUnixRetrieval":{
+      "query":"Represent the Unix question for retrieving answers: ",
+      "corpus":"Represent the Unix answer for retrieval: "
+    },
+    "CQADupstackMathematicaRetrieval":{
+      "query":"Represent the Mathematical question for retrieving answers: ",
+      "corpus":"Represent the Mathematical answer for retrieval: "
+    },
+    "CQADupstackStatsRetrieval":{
+      "query":"Represent the Statistical question for retrieving answers: ",
+      "corpus":"Represent the Statistical answer for retrieval: "
+    },
+    "CQADupstackPhysicsRetrieval":{
+      "query":"Represent the Physics question for retrieving answers: ",
+      "corpus":"Represent the Physics answer for retrieval: "
+    },
+    "CQADupstackProgrammersRetrieval":{
+      "query":"Represent the Programming question for retrieving answers: ",
+      "corpus":"Represent the Programming answer for retrieval: "
+    },
+    "CQADupstackAndroidRetrieval":{
+      "query":"Represent the Android question for retrieving answers: ",
+      "corpus":"Represent the Android answer for retrieval: "
+    },
+    "CQADupstackWordpressRetrieval":{
+      "query":"Represent the Wordpress question for retrieving answers: ",
+      "corpus":"Represent the Wordpress answer for retrieval: "
+    },
+    "FiQA2018":{
+      "query":"Represent the finance question for retrieving the supporting answers: ",
+      "corpus":"Represent the finance answer for retrieval: "
+    }
+  },
+  "STS":{
+    "STS12":"Represent the statement, ",
+    "STS13":"represent the statement, ",
+    "STS14":"Represent the statement, ",
+    "STS15":"Represent the post, ",
+    "STS16":"Represent the post: ",
+    "STS17":"Represent the sentence for classification: ",
+    "STS22":"represent the statement: ",
+    "BIOSSES":"Represent the Bio-medical statement: ",
+    "SICK-R":"Represent the statement: ",
+    "STSBenchmark":"represent the statement: "
+  },
+  "Summarization":{
+    "SummEval":"Represent the news sentence for retrieval: "
+  }
+}

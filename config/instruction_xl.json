@@ -1,0 +1,173 @@
+{
+  "Classification":{
+    "Banking77Classification":"Represent the bank77 purposes for retrieving its bank intent: ",
+    "EmotionClassification":"Represent the amazon emotion sentence for classifying the emotion: ",
+    "AmazonCounterfactualClassification":"Represent Daily casual counter-sentences for categorization as correct-sentences or counter-sentences: ",
+    "ImdbClassification":"Represent a review sentence for classifying emotion as positive or negative: ",
+    "MassiveIntentClassification":"Represent the sentence for categorizing its task intent as qa_maths, takeaway_order, audio_volume_other, recommendation_movies, iot_cleaning, qa_stock, or recommendation_locations: ",
+    "MassiveScenarioClassification":"represent an ms sentence for retrieving its intent: ",
+    "MTOPDomainClassification":"represent a MTO sentence to retrieve the task intention: ",
+    "MTOPIntentClassification":"Represent an mto sentence for retrieving its behind task intention: ",
+    "ToxicConversationsClassification":"Represent a toxicity comment for classifying its toxicity as toxic or non-toxic: ",
+    "AmazonPolarityClassification":"Represent the sentiment comment for retrieving a duplicate sentence: ",
+    "AmazonReviewsClassification":"Represent an amazon review sentence to find the emoation; ",
+    "TweetSentimentExtractionClassification":"Represent Daily-life spoken sentences for categorization; Input: "
+  },
+  "Clustering":{
+    "TwentyNewsgroupsClustering":"Represent the news comment for clustering; ",
+    "BiorxivClusteringS2S":"Represent the biological statement for retrieval; ",
+    "MedrxivClusteringS2S":"Represent the Biological statement for clustering biological statements: ",
+    "ArxivClusteringP2P":"Represent the science passage for retrieval: ",
+    "ArxivClusteringS2S":"Represent the Science statements for retrieval: ",
+    "BiorxivClusteringP2P":"Represent the Biological passage for retrieval: ",
+    "MedrxivClusteringP2P":"Represent the Biological paragraph for retrieval: ",
+    "RedditClustering":"represent the Reddit community title: ",
+    "RedditClusteringP2P":"represent a Reddit community passage: ",
+    "StackExchangeClustering":"Represent a question for retrieval: ",
+    "StackExchangeClusteringP2P":"Represent the question and answer passage for retrieving relevant question and answer passages: "
+  },
+  "PairClassification":{
+    "TwitterSemEval2015":"Represent the twitter post for retrieving comments: ",
+    "TwitterURLCorpus":"represent a Twitter posts for retrieval: ",
+    "SprintDuplicateQuestions":"represent the Sprint questions for retrieving relevant posts, "
+  },
+  "Reranking":{
+    "AskUbuntuDupQuestions":{
+      "query":"Represent the Ubuntu question to retrieve a duplicate question: ",
+      "corpus":"Represent the Ubuntu question: "
+    },
+    "StackOverflowDupQuestions":{
+      "query":"Represent the StackOverflow question: ",
+      "corpus":"Represent the StackOverflow question: "
+    },
+    "SciDocsRR":{
+      "query":"Represent the Science question: ",
+      "corpus":"Represent the Science document: "
+    },
+    "MindSmallReranking":{
+      "query":"Represent the news query for retrieving articles: ",
+      "corpus":"Represent the news article for retrieval: "
+    }
+  },
+  "Retrieval":{
+    "ClimateFEVER":{
+      "query":"Represent the Climate question for retrieving supporting documents: ",
+      "corpus":"Represent the document for retrieval: "
+    },
+    "HotpotQA":{
+      "query":"Represent the Wikipedia question for retrieving supporting documents: ",
+      "corpus":"Represent the document for retrieval: "
+    },
+    "FEVER":{
+      "query":"Represent the fact for retrieving supporting evidence: ",
+      "corpus":"Represent the evidence for retrieval: "
+    },
+    "MSMARCO":{
+      "query":"Represent the question for retrieving supporting documents: ",
+      "corpus":"Represent the document for retrieval: "
+    },
+    "DBPedia":{
+      "query":"Represent the Wikipedia questions to retrieve a supporting document: ",
+      "corpus":"Represent the Wikipedia documents for retrieval: "
+    },
+    "NQ":{
+      "query":"Represent the Wikipedia question for retrieving supporting documents: ",
+      "corpus":"Represent the document for retrieval: "
+    },
+    "QuoraRetrieval":{
+      "query":"Represent the Quora question to retrieve question: ",
+      "corpus":"Represent the Quora question to retrieve question: "
+    },
+    "SCIDOCS":{
+      "query":"Represent a Science question for retrieving supporting papers: ",
+      "corpus":"Represent the Science paper: "
+    },
+    "TRECCOVID":{
+      "query":"Represent the Coronavirus questions to retrieve a supporting document: ",
+      "corpus":"Represent the Coronavirus documents for retrieval: "
+    },
+    "Touche2020":{
+      "query":"Represent questions: ",
+      "corpus":"Represent arguments: "
+    },
+    "SciFact":{
+      "query":"Represent the Scientific queries for retrieving a supporting passage: ",
+      "corpus":"represent the scientific paragraph for retrieval: "
+    },
+    "NFCorpus":{
+      "query":"Represent the nutrition facts to retrieve Public medical articles: ",
+      "corpus":"Represent the Public medical articles for retrieval: "
+    },
+    "ArguAna":{
+      "query":"Represent Debating conversations to retrieve a counter-argument: ",
+      "corpus":"Represent counter-arguments: "
+    },
+    "CQADupstackTexRetrieval":{
+      "query":"Represent the question for retrieving answers: ",
+      "corpus":"Represent the answer for retrieval: "
+    },
+    "CQADupstackWebmastersRetrieval":{
+      "query":"Represent the Webmaster question for retrieving answers: ",
+      "corpus":"Represent the Webmaster answer: "
+    },
+    "CQADupstackEnglishRetrieval":{
+      "query":"Represent the English question for retrieving documents: ",
+      "corpus":"Represent the English answer for retrieval: "
+    },
+    "CQADupstackGamingRetrieval":{
+      "query":"Represent the Gaming question for retrieving answers: ",
+      "corpus":"Represent the Gaming answer for retrieval: "
+    },
+    "CQADupstackGisRetrieval":{
+      "query":"Represent the Gis question for retrieving answers: ",
+      "corpus":"Represent the Gis answer for retrieval: "
+    },
+    "CQADupstackUnixRetrieval":{
+      "query":"Represent the Unix questions to retrieve a supporting answer: ",
+      "corpus":"Represent the Unix answers for retrieval: "
+    },
+    "CQADupstackMathematicaRetrieval":{
+      "query":"Represent the Mathematical question for retrieving answers: ",
+      "corpus":"Represent the Mathematical answer for retrieval: "
+    },
+    "CQADupstackStatsRetrieval":{
+      "query":"Represent the Statistical question for retrieving answers: ",
+      "corpus":"Represent the Statistical answer for retrieval: "
+    },
+    "CQADupstackPhysicsRetrieval":{
+      "query":"Represent the Physics question for retrieving answers: ",
+      "corpus":"Represent the Physics answer for retrieval: "
+    },
+    "CQADupstackProgrammersRetrieval":{
+      "query":"Represent the Programming question for retrieving answers: ",
+      "corpus":"Represent the Programming answer for retrieval: "
+    },
+    "CQADupstackAndroidRetrieval":{
+      "query":"Represent the Android question for retrieving answers: ",
+      "corpus":"Represent the Android answer for retrieval: "
+    },
+    "CQADupstackWordpressRetrieval":{
+      "query":"Represent the Wordpress question for retrieving answers: ",
+      "corpus":"Represent the Wordpress answer for retrieval: "
+    },
+    "FiQA2018":{
+      "query":"Represent the finance questions to retrieve a supporting answer: ",
+      "corpus":"Represent the finance answers for retrieval: "
+    }
+  },
+  "STS":{
+    "STS12":"represent texts, ",
+    "STS13":"represent a casual post, ",
+    "STS14":"Represent a post; ",
+    "STS15":"Represent a posts,,, ",
+    "STS16":"Represent posts: ",
+    "STS17":"Represent a statement, ",
+    "STS22":"represent the statement: ",
+    "BIOSSES":"represent the Biological statement: ",
+    "SICK-R":"Represent a post: ",
+    "STSBenchmark":"represent posts, "
+  },
+  "Summarization":{
+    "SummEval":"Represent the news statement for retrieval: "
+  }
+}
