@@ -30,7 +30,7 @@ def get_args():
 
     parser.add_argument('--instruct', action='store_true', help='evaluation with instruction')
 
-    parser.add_argument('--instruction_path', type=str, default='config/instruction_base.json', help="path to instructions for mteb")
+    parser.add_argument('--instruction_path', type=str, default=None, help="path to instructions for mteb")
 
 
     args = parser.parse_args()
