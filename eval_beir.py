@@ -58,6 +58,7 @@ class RetrievalModel(DRESModel):
             residual_pooler=args.residual_pooler,
         ).load_pretrained(args.model_name_or_path)
         self.tokenizer = AutoTokenizer.from_pretrained(args.model_name_or_path)
+        self.prompt = ""
 
         self.gpu_count = torch.cuda.device_count()
 
