@@ -71,9 +71,21 @@ class DenseEncoder(torch.nn.Module):
             self.encoder = torch.nn.DataParallel(self.encoder)
         
         self.prompt = ""
+    
+    def encode(self, sentences, **kwargs) -> np.ndarray:
+        input_texts = [self.prompt + s for s in sentences]
+        return self._do_encode(input_texts)
+    
+    def encode_queries(self, queries: List[str], **kwargs) -> np.ndarray:
+        input_texts = [self.prompt['query'] + q for q in queries]
+        return self._do_encode(input_texts)
+
+    def encode_corpus(self, corpus: List[Dict[str, str]], **kwargs) -> np.ndarray:
+        input_texts = [self.prompt['corpus'] + '{} {}'.format(doc.get('title', ''), doc['text']).strip() for doc in corpus]
+        return self._do_encode(input_texts)
 
     @torch.no_grad()
-    def encode(self, sentences, **kwargs) -> np.ndarray:
+    def _do_encode(self, input_texts, **kwargs) -> np.ndarray:
         """ Returns a list of embeddings for the given sentences.
         Args:
             sentences (`List[str]`): List of sentences to encode
@@ -82,8 +94,6 @@ class DenseEncoder(torch.nn.Module):
         Returns:
             `List[np.ndarray]` or `List[tensor]`: List of embeddings for the given sentences
         """
-
-        input_texts: List[str] = [self.prompt + s for s in sentences]
 
         encoded_embeds = []
         batch_size = 64 * self.gpu_count
