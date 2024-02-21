@@ -7,7 +7,7 @@ import numpy as np
 import argparse
 
 from transformers import AutoTokenizer
-from typing import List
+from typing import List, Dict
 from mteb import MTEB
 
 from models import AutoModelForSentenceEmbedding
@@ -80,8 +80,8 @@ class DenseEncoder(torch.nn.Module):
         input_texts = [self.prompt['query'] + q for q in queries]
         return self._do_encode(input_texts)
 
-    def encode_corpus(self, corpus: List[Dict[str, str]], **kwargs) -> np.ndarray:
-        input_texts = [self.prompt['corpus'] + '{} {}'.format(doc.get('title', ''), doc['text']).strip() for doc in corpus]
+    def encode_corpus(self, corpus: List[str], **kwargs) -> np.ndarray:
+        input_texts = [self.prompt['corpus'] + doc for doc in corpus]
         return self._do_encode(input_texts)
 
     @torch.no_grad()
@@ -118,7 +118,7 @@ class DenseEncoder(torch.nn.Module):
 
         return np.concatenate(encoded_embeds, axis=0)
     
-    def set_prompt(self, prompt: str):
+    def set_prompt(self, prompt):
         self.prompt = prompt
 
 
